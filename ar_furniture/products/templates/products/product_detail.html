@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ product.name }}</title>
+  <!-- Include Model Viewer for AR -->
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <div class="wrapper">
+    <!-- Header with Navigation -->
+    <header>
+        <nav class="navbar">
+          <a href="{% url 'products:product_list' %}" class="logo">Furniture Store</a>
+          <ul class="nav-links">
+            <li><a href="{% url 'products:product_list' %}" class="active">Home</a></li>
+            <li><a href="#">Shop</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+          <div class="menu-btn">&#9776;</div>
+        </nav>
+      </header>
+      
+      <script>
+        // Toggle Mobile Menu
+        document.querySelector(".menu-btn").addEventListener("click", function() {
+          document.querySelector(".nav-links").classList.toggle("active");
+        });
+      </script>
+
+    <!-- Main Content -->
+    <main class="container content">
+      <!-- Product Detail Section -->
+      <section class="product-detail">
+        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img">
+        <div class="product-info">
+          <h2>{{ product.name }}</h2>
+          <p class="description">{{ product.description }}</p>
+          <p class="price">Rs {{ product.price }}</p>
+          <div class="btn1">
+            <a href="{% url 'products:product_list' %}" class="btn">Buy</a>
+          </div>
+          
+
+        </div>
+      </section>
+
+      <!-- AR Section -->
+      <section class="ar-section">
+        <h2>View in Augmented Reality</h2>
+        <div class="ar-container">
+          <model-viewer 
+            src="{{ product.model_3d.url }}"
+            alt="A 3D model of {{ product.name }}"
+            ar
+            ar-modes="webxr scene-viewer quick-look"
+            camera-controls
+            auto-rotate>
+          </model-viewer>
+        </div>
+      </section>
+
+      <!-- Back Button -->
+      <div class="back-btn">
+        <a href="{% url 'products:product_list' %}" class="btn">Back to Products</a>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <p>&copy; 2025 Your Company Name. All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

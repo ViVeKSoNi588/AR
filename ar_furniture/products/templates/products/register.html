@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Signup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 60px 70px; /* Increased padding for a larger form */
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Larger shadow for emphasis */
+            width: 100%;
+            max-width: 700px; /* Increased max-width for a larger form */
+            box-sizing: border-box;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333333;
+            font-size: 36px; /* Increased font size for the heading */
+            margin-bottom: 40px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #555555;
+            font-size: 22px; /* Increased font size for labels */
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 20px; /* Increased padding for inputs */
+            margin-bottom: 30px;
+            border: 1px solid #cccccc;
+            border-radius: 10px;
+            font-size: 20px; /* Increased font size for inputs */
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 20px; /* Increased padding for the button */
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 22px; /* Increased font size for the button */
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .messages {
+            margin-top: 25px;
+            color: red;
+            font-size: 20px; /* Increased font size for messages */
+        }
+
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 25px;
+            color: #007BFF;
+            font-size: 20px; /* Increased font size for the link */
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 50px 60px;
+                max-width: 95%; /* Adjusted for tablets */
+            }
+
+            h2 {
+                font-size: 32px;
+            }
+
+            label {
+                font-size: 20px;
+            }
+
+            input[type="text"], input[type="password"] {
+                padding: 18px;
+                font-size: 18px;
+            }
+
+            button {
+                font-size: 20px;
+                padding: 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 40px 50px;
+                max-width: 100%; /* Adjusted for mobile devices */
+            }
+
+            h2 {
+                font-size: 30px;
+            }
+
+            label {
+                font-size: 18px;
+            }
+
+            input[type="text"], input[type="password"] {
+                padding: 16px;
+                font-size: 18px;
+            }
+
+            button {
+                font-size: 18px;
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Signup</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="confirm_password">Confirm Password:</label>
+            <input type="password" id="confirm_password" name="confirm_password" required>
+
+            <button type="submit">Signup</button>
+        </form>
+        {% if messages %}
+            <div class="messages">
+                <ul>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        <a href="{% url 'products:login' %}">Already have an account? Login</a>
+    </div>
+</body>
+</html>
