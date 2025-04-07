@@ -52,15 +52,49 @@
       <section class="ar-section">
         <h2>View in Augmented Reality</h2>
         <div class="ar-container">
-          <model-viewer 
-            src="{{ product.model_3d.url }}"
-            alt="A 3D model of {{ product.name }}"
-            ar
-            ar-modes="webxr scene-viewer quick-look"
-            camera-controls
-            auto-rotate>
-          </model-viewer>
+            <!-- Product Variant Selector -->
+            <label for="variant-selector">Choose a variant:</label>
+            <select id="variant-selector">
+                <option value="{{ product.model_3d.url }}">Default</option>
+                <option value="{{ product.variant_1_model_3d.url }}">Variant 1</option>
+                <option value="{{ product.variant_2_model_3d.url }}">Variant 2</option>
+            </select>
+
+            <!-- AR Usage Tips -->
+            <div class="ar-tips">
+                <p><strong>Tips for AR:</strong></p>
+                <ul>
+                    <li>Ensure good lighting for better AR tracking.</li>
+                    <li>Move your device around to scan the surface.</li>
+                    <li>Tap on the product to reposition it.</li>
+                </ul>
+            </div>
+
+            <!-- Launch AR Viewer -->
+            <model-viewer 
+                id="ar-viewer"
+                src="{{ product.model_3d.url }}"
+                alt="A 3D model of {{ product.name }}"
+                ar
+                ar-modes="webxr scene-viewer quick-look"
+                camera-controls
+                auto-rotate>
+            </model-viewer>
+            <button id="launch-ar">Launch AR</button>
         </div>
+        <script>
+            const viewer = document.getElementById('ar-viewer');
+            const selector = document.getElementById('variant-selector');
+            const launchButton = document.getElementById('launch-ar');
+
+            selector.addEventListener('change', (event) => {
+                viewer.setAttribute('src', event.target.value);
+            });
+
+            launchButton.addEventListener('click', () => {
+                viewer.activateAR();
+            });
+        </script>
       </section>
 
       <!-- Back Button -->
