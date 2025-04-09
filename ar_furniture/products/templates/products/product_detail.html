@@ -1,4 +1,10 @@
+{% extends 'products/base.html' %}
 {% load static %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+{% block content %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +13,25 @@
   <!-- Include Model Viewer for AR -->
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <script src="https://kit.fontawesome.com/c92e7412c5.js" crossorigin="anonymous"></script>
+
+  <style>
+    .cart-icon {
+        position: relative; /* Position relative for the count */
+        font-size: 28px; /* Increased font size */
+    }
+
+    .cart-count {
+        position: absolute; /* Position absolute for the count */
+        top: -10px; /* Move the count to the top-right corner */
+        right: -10px; /* Move the count to the top-right corner */
+        background-color: red; /* Background color for the count */
+        color: white; /* Text color for the count */
+        border-radius: 50%; /* Rounded corners for the count */
+        padding: 2px 6px; /* Padding for the count */
+        font-size: 12px; /* Font size for the count */
+    }
+  </style>
 </head>
 <body>
   <div class="wrapper">
@@ -17,8 +42,15 @@
           <ul class="nav-links">
             <li><a href="{% url 'products:product_list' %}" class="active">Home</a></li>
             <li><a href="#">Shop</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Contact</a></li>
+            <li><a href="{% url 'products:about' %}">About</a></li>
+            <li><a href="{% url 'products:contact' %}">Contact</a></li>
+            <li>
+                <a href="{% url 'products:view_cart' %}" class="cart-icon" style="color: #ffffff;">
+                  <i class="fa-solid fa-cart-shopping fa-xl"></i>
+
+                    <span class="cart-count">{{ total_items|default:0 }}</span>
+                </a>
+            </li>
           </ul>
           <div class="menu-btn">&#9776;</div>
         </nav>
@@ -41,10 +73,30 @@
           <p class="description">{{ product.description }}</p>
           <p class="price">Rs {{ product.price }}</p>
           <div class="btn1">
-            <a href="{% url 'products:product_list' %}" class="btn">Buy</a>
+            <button class="btn" id="add-to-cart-btn" data-product-id="{{ product.pk }}">Add to Cart</button>
           </div>
-          
-
+          <script>
+            document.getElementById('add-to-cart-btn').addEventListener('click', function () {
+                const productId = this.getAttribute('data-product-id');
+                fetch(`/product/${productId}/add-to-cart/`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const cartIcon = document.querySelector('.cart-icon .cart-count');
+                        cartIcon.textContent = data.total_items; // Update the cart count dynamically
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+          </script>
+          <div class="btn1">
+            <a href="{% url 'products:product_payment_page' product.pk %}" class="btn">Buy</a>
+          </div>
         </div>
       </section>
 
@@ -52,49 +104,42 @@
       <section class="ar-section">
         <h2>View in Augmented Reality</h2>
         <div class="ar-container">
-            <!-- Product Variant Selector -->
-            <label for="variant-selector">Choose a variant:</label>
-            <select id="variant-selector">
-                <option value="{{ product.model_3d.url }}">Default</option>
-                <option value="{{ product.variant_1_model_3d.url }}">Variant 1</option>
-                <option value="{{ product.variant_2_model_3d.url }}">Variant 2</option>
-            </select>
-
-            <!-- AR Usage Tips -->
-            <div class="ar-tips">
-                <p><strong>Tips for AR:</strong></p>
-                <ul>
-                    <li>Ensure good lighting for better AR tracking.</li>
-                    <li>Move your device around to scan the surface.</li>
-                    <li>Tap on the product to reposition it.</li>
-                </ul>
-            </div>
-
-            <!-- Launch AR Viewer -->
-            <model-viewer 
-                id="ar-viewer"
-                src="{{ product.model_3d.url }}"
-                alt="A 3D model of {{ product.name }}"
-                ar
-                ar-modes="webxr scene-viewer quick-look"
-                camera-controls
-                auto-rotate>
-            </model-viewer>
-            <button id="launch-ar">Launch AR</button>
+          <model-viewer 
+            src="{{ product.model_3d.url }}"
+            alt="A 3D model of {{ product.name }}"
+            ar
+            ar-modes="webxr scene-viewer quick-look"
+            camera-controls
+            auto-rotate>
+          </model-viewer>
+          <div class="color-picker">
+            <label for="bg-color">Change Background Color:</label>
+            <input type="color" id="bg-color" value="#ffffff">
+          </div>
         </div>
-        <script>
-            const viewer = document.getElementById('ar-viewer');
-            const selector = document.getElementById('variant-selector');
-            const launchButton = document.getElementById('launch-ar');
+      </section>
+      <script>
+        // Add event listener for the background color picker
+        document.getElementById('bg-color').addEventListener('input', (event) => {
+            const modelViewer = document.querySelector('model-viewer');
+            modelViewer.style.backgroundColor = event.target.value;
+        });
+      </script>
 
-            selector.addEventListener('change', (event) => {
-                viewer.setAttribute('src', event.target.value);
-            });
-
-            launchButton.addEventListener('click', () => {
-                viewer.activateAR();
-            });
-        </script>
+      <!-- Recommended Products Section -->
+      <section class="recommended-products">
+        <h2>Recommended Products</h2>
+        <div class="product-list">
+          {% for product in recommended_products %}
+            <div class="product-card">
+              <a href="{% url 'products:product_detail' product.pk %}">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" width="150">
+                <h3>{{ product.name }}</h3>
+              </a>
+              <p>Rs {{ product.price }}</p>
+            </div>
+          {% endfor %}
+        </div>
       </section>
 
       <!-- Back Button -->
@@ -105,10 +150,9 @@
 
     <!-- Footer -->
     <footer>
-      <div class="container">
-        <p>&copy; 2025 Your Company Name. All rights reserved.</p>
-      </div>
+        <p>&copy; 2023 Furniture Store. All rights reserved.</p>
     </footer>
   </div>
 </body>
 </html>
+{% endblock %}

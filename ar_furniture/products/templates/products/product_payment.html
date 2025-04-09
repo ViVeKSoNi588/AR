@@ -1,0 +1,140 @@
+{% extends 'products/base.html' %}
+{% load static %}
+
+{% block styles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment for {{ product.name }}</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            color: #333333;
+            font-size: 28px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #555555;
+        }
+
+        textarea, select, input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cccccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #007BFF;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        #payment-details-container {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Payment for {{ product.name }}</h1>
+        <form method="POST">
+            {% csrf_token %}
+            <label for="address">Shipping Address:</label>
+            <textarea id="address" name="address" rows="4" required></textarea>
+
+            <label for="payment_type">Payment Type:</label>
+            <select id="payment_type" name="payment_type" required>
+                <option value="">Select Payment Type</option>
+                <option value="upi">UPI</option>
+                <option value="credit_card">Credit Card</option>
+                <option value="debit_card">Debit Card</option>
+                <option value="cod">Cash on Delivery</option>
+            </select>
+
+            <div id="payment-details-container">
+                <label for="payment_details" id="payment-details-label"></label>
+                <input type="text" id="payment_details" name="payment_details">
+                <button type="button" id="verify-btn" class="btn">Verify</button>
+            </div>
+
+            <button type="submit" class="btn">Proceed to Order Confirmation</button>
+        </form>
+    </div>
+    <script>
+        const paymentTypeSelect = document.getElementById('payment_type');
+        const paymentDetailsContainer = document.getElementById('payment-details-container');
+        const paymentDetailsLabel = document.getElementById('payment-details-label');
+        const paymentDetailsInput = document.getElementById('payment_details');
+        const verifyButton = document.getElementById('verify-btn');
+
+        paymentTypeSelect.addEventListener('change', function () {
+            const selectedType = this.value;
+            if (selectedType === 'upi') {
+                paymentDetailsContainer.style.display = 'block';
+                paymentDetailsLabel.textContent = 'Enter UPI ID:';
+                paymentDetailsInput.placeholder = 'e.g., yourname@upi';
+                verifyButton.style.display = 'inline-block';
+            } else if (selectedType === 'credit_card' || selectedType === 'debit_card') {
+                paymentDetailsContainer.style.display = 'block';
+                paymentDetailsLabel.textContent = 'Enter Card Number:';
+                paymentDetailsInput.placeholder = 'e.g., 1234 5678 9012 3456';
+                verifyButton.style.display = 'none';
+            } else {
+                paymentDetailsContainer.style.display = 'none';
+            }
+        });
+
+        verifyButton.addEventListener('click', function () {
+            const upiId = paymentDetailsInput.value;
+            if (upiId) {
+                alert('UPI ID verified successfully!');
+            } else {
+                alert('Please enter a valid UPI ID.');
+            }
+        });
+    </script>
+</body>
+</html>
+{% endblock %}
+

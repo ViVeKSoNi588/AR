@@ -1,59 +1,90 @@
+{% extends 'products/base.html' %}
 {% load static %}
+
+{% block styles %}
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
+<script src="https://kit.fontawesome.com/c92e7412c5.js" crossorigin="anonymous"></script>
+<style>
+    .logout-btn {
+        color: white;
+        background-color: red;
+        padding: 10px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+    }
 
+    .logout-btn:hover {
+        background-color: darkred;
+    }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Furniture Products</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <style>
-        /* Style for the logout button */
-        .logout-btn {
-            color: white; /* Text color */
-            background-color: red; /* Button background color */
-            padding: 10px 15px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-        }
+    .cart-icon {
+        color: rgb(255, 255, 255);
+        position: relative;
+    }
 
-        .logout-btn:hover {
-            background-color: darkred; /* Darker red on hover */
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <nav class="navbar">
-          <a href="{% url 'products:product_list' %}" class="logo">Furniture Store</a>
-          <ul class="nav-links">
+    .cart-count {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        background-color: red;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 6px;
+        font-size: 12px;
+    }
+
+    footer {
+        text-align: center;
+        padding: 10px;
+        background-color: #333;
+        color: white;
+        border-top: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<header>
+    <nav class="navbar">
+        <a href="{% url 'products:product_list' %}" class="logo">Furniture Store</a>
+        <ul class="nav-links">
             <li><a href="{% url 'products:product_list' %}" class="active">Home</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Contact</a></li>
-            <li><a href="{% url 'products:logout' %}" class="logout-btn">Logout</a></li> <!-- Logout Button -->
-          </ul>
-          <div class="menu-btn">&#9776;</div>
-        </nav>
-      </header>
-      
-      <script>
-        // Toggle Mobile Menu
-        document.querySelector(".menu-btn").addEventListener("click", function() {
-          document.querySelector(".nav-links").classList.toggle("active");
-        });
-      </script>
-    <div class="product-list">
-        {% for product in products %}
-            <div class="product-card">
-                <a href="{% url 'products:product_detail' product.pk %}">
-                    <img src="{{ product.image.url }}" alt="{{ product.name }}" width="250">
-                    <h2>{{ product.name }}</h2>
+            <li><a href="{% url 'products:about' %}">About</a></li>
+            <li><a href="{% url 'products:contact' %}">Contact</a></li>
+            <li>
+                <a href="{% url 'products:view_cart' %}" class="cart-icon">
+                    <i class="fa-solid fa-cart-shopping fa-xl"></i>
+                    
+                    <span class="cart-count">{{ total_items|default:0 }}</span>
                 </a>
-                <p>Rs {{ product.price }}</p>
-            </div>
-        {% endfor %}
-    </div>
-</body>
-</html>
+            </li>
+            <li><a href="{% url 'products:logout' %}" class="logout-btn">Logout</a></li>
+        </ul>
+        <div class="menu-btn">&#9776;</div>
+    </nav>
+</header>
+
+<script>
+    // Toggle Mobile Menu
+    document.querySelector(".menu-btn").addEventListener("click", function() {
+        document.querySelector(".nav-links").classList.toggle("active");
+    });
+</script>
+
+<div class="product-list">
+    {% for product in products %}
+        <div class="product-card">
+            <a href="{% url 'products:product_detail' product.pk %}">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" width="250">
+                <h2>{{ product.name }}</h2>
+            </a>
+            <p>Rs {{ product.price }}</p>
+        </div>
+    {% endfor %}
+</div>
+
+<footer>
+    <p>&copy; 2023 Furniture Store. All rights reserved.</p>
+</footer>
+{% endblock %}

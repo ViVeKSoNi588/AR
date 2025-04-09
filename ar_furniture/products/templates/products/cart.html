@@ -1,0 +1,105 @@
+{% extends 'products/base.html' %}
+{% load static %}
+
+{% block styles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Cart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 40px 50px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        h1 {
+            color: #333333;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table th, table td {
+            border: 1px solid #cccccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f4f4f9;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Your Cart</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart_items %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>
+                        <a href="{% url 'products:decrement_cart_item' item.id %}" class="btn">-</a>
+                        {{ item.quantity }}
+                        <a href="{% url 'products:increment_cart_item' item.id %}" class="btn">+</a>
+                    </td>
+                    <td>Rs {{ item.product.price }}</td>
+                    <td>
+                        <a href="{% url 'products:remove_from_cart' item.id %}" class="btn">Remove</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{% url 'products:payment_page' %}" class="btn">Buy All</a>
+        <a href="{% url 'products:product_list' %}" class="btn">Continue Shopping</a>
+    </div>
+</body>
+</html>
+{% endblock %}
+
+
+ 

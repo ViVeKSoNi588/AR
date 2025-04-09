@@ -1,0 +1,72 @@
+{% extends 'products/base.html' %}
+{% load static %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<script src="https://kit.fontawesome.com/c92e7412c5.js" crossorigin="anonymous"></script>
+<style>
+    main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 70vh;
+        text-align: center;
+    }
+    h2 {
+        margin-bottom: 20px;
+        font-size: 24px;
+        color: #333;
+    }
+    p {
+        max-width: 800px;
+        line-height: 1.6;
+        color: #555;
+    }
+  
+</style>
+{% endblock %}
+
+{% block content %}
+<header>
+    <nav class="navbar">
+        <a href="{% url 'products:product_list' %}" class="logo">Furniture Store</a>
+        <ul class="nav-links">
+            <li><a href="{% url 'products:product_list' %}">Home</a></li>
+            <li><a href="{% url 'products:about' %}" class="active">About</a></li>
+            <li><a href="{% url 'products:contact' %}">Contact</a></li>
+            <li>
+                <a href="{% url 'products:view_cart' %}" class="cart-icon">
+                    <i class="fa-solid fa-cart-shopping fa-xl"></i>
+                    <span class="cart-count">{{ total_items|default:0 }}</span>
+                </a>
+            </li>
+            <li><a href="{% url 'products:logout' %}" class="logout-btn">Logout</a></li>
+        </ul>
+        <div class="menu-btn">&#9776;</div>
+    </nav>
+</header>
+
+<script>
+    // Toggle Mobile Menu
+    document.querySelector(".menu-btn").addEventListener("click", function() {
+        document.querySelector(".nav-links").classList.toggle("active");
+    });
+</script>
+
+<main>
+    <h2>About Us</h2>
+    <p>
+        Welcome to Furniture Store! We are dedicated to providing high-quality furniture that combines style and comfort. 
+        Our mission is to help you create beautiful spaces that reflect your personality and meet your needs.
+    </p>
+    <p>
+        With years of experience in the furniture industry, we pride ourselves on offering a wide range of products, 
+        from modern designs to timeless classics. Thank you for choosing us to be a part of your home.
+    </p>
+</main>
+
+<footer>
+    <p>&copy; 2023 Furniture Store. All rights reserved.</p>
+</footer>
+{% endblock %}
