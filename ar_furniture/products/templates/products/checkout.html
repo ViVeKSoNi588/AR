@@ -2,95 +2,997 @@
 {% load static %}
 
 {% block styles %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Checkout</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .container {
-            background-color: #ffffff;
-            padding: 40px 50px;
-            border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+<style>
+    /* Custom styles for Checkout page */
+    .checkout-container {
+        padding: var(--space-xl) 0;
+    }
+    
+    .breadcrumb-container {
+        background-color: var(--color-light);
+        padding: var(--space-sm) 0;
+        margin-bottom: var(--space-lg);
+    }
+    
+    .checkout-steps {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: var(--space-lg);
+        position: relative;
+    }
+    
+    .checkout-steps::before {
+        content: "";
+        position: absolute;
+        top: 24px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: #e0e0e0;
+        z-index: 1;
+    }
+    
+    .step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .step-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: var(--color-white);
+        border: 2px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        margin-bottom: var(--space-xs);
+        transition: var(--transition);
+    }
+    
+    .step-text {
+        font-size: 0.9rem;
+        color: var(--color-text-light);
+        font-weight: 500;
+        text-align: center;
+    }
+    
+    .step.active .step-circle {
+        background-color: var(--color-primary);
+        border-color: var(--color-primary);
+        color: var(--color-white);
+    }
+    
+    .step.active .step-text {
+        color: var(--color-primary);
+    }
+    
+    .step.completed .step-circle {
+        background-color: var(--color-success);
+        border-color: var(--color-success);
+        color: var(--color-white);
+    }
+    
+    .checkout-card {
+        background-color: var(--color-white);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+        padding: var(--space-lg);
+        margin-bottom: var(--space-lg);
+    }
+    
+    .checkout-title {
+        margin-bottom: var(--space-md);
+        color: var(--color-primary);
+        font-size: 1.5rem;
+    }
+    
+    .form-group {
+        margin-bottom: var(--space-md);
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: var(--space-xs);
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: var(--color-text);
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #e0e0e0;
+        border-radius: var(--radius-md);
+        font-size: 1rem;
+        transition: var(--transition);
+    }
+    
+    .form-control:focus {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(42, 59, 76, 0.1);
+        outline: none;
+    }
+    
+    .required:after {
+        content: ' *';
+        color: var(--color-error);
+    }
+    
+    .address-select {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-md);
+    }
+    
+    .address-card {
+        border: 1px solid #e0e0e0;
+        border-radius: var(--radius-md);
+        padding: var(--space-md);
+        width: calc(50% - var(--space-sm));
+        transition: var(--transition);
+        cursor: pointer;
+        position: relative;
+    }
+    
+    .address-card:hover {
+        border-color: var(--color-primary);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .address-card.selected {
+        border-color: var(--color-primary);
+        background-color: rgba(42, 59, 76, 0.05);
+    }
+    
+    .address-card.selected:before {
+        content: "✓";
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        color: var(--color-primary);
+        font-weight: bold;
+    }
+    
+    .address-card h4 {
+        margin-bottom: var(--space-xs);
+        font-size: 1rem;
+    }
+    
+    .address-card p {
+        margin: 0;
+        color: var(--color-text-light);
+        font-size: 0.9rem;
+    }
+    
+    .address-type {
+        display: inline-block;
+        background-color: #e0e0e0;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-bottom: var(--space-sm);
+    }
+    
+    .new-address-btn {
+        border: 1px dashed #e0e0e0;
+        border-radius: var(--radius-md);
+        padding: var(--space-md);
+        width: calc(50% - var(--space-sm));
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+        cursor: pointer;
+        background-color: transparent;
+    }
+    
+    .new-address-btn:hover {
+        border-color: var(--color-primary);
+    }
+    
+    .btn-add-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: var(--space-xs);
+    }
+    
+    .btn-add-icon i {
+        color: var(--color-primary);
+    }
+    
+    .payment-methods {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-md);
+        margin-bottom: var(--space-md);
+    }
+    
+    .payment-method {
+        display: flex;
+        align-items: center;
+        padding: var(--space-sm);
+        border: 1px solid #e0e0e0;
+        border-radius: var(--radius-md);
+        transition: var(--transition);
+        cursor: pointer;
+        width: calc(50% - var(--space-sm));
+    }
+    
+    .payment-method:hover {
+        border-color: var(--color-primary);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .payment-method.selected {
+        border-color: var(--color-primary);
+        background-color: rgba(42, 59, 76, 0.05);
+    }
+    
+    .payment-method input[type="radio"] {
+        margin-right: var(--space-sm);
+    }
+    
+    .payment-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: var(--space-sm);
+        flex-shrink: 0;
+    }
+    
+    .payment-icon i {
+        font-size: 1.5rem;
+        color: var(--color-primary);
+    }
+    
+    .payment-icon img {
+        max-width: 100%;
+        max-height: 100%;
+    }
+    
+    .payment-details {
+        flex: 1;
+    }
+    
+    .payment-title {
+        font-weight: 500;
+    }
+    
+    .payment-description {
+        font-size: 0.8rem;
+        color: var(--color-text-light);
+    }
+    
+    .credit-card-inputs {
+        margin-top: var(--space-md);
+    }
+    
+    .card-row {
+        display: flex;
+        gap: var(--space-md);
+    }
+    
+    .order-summary {
+        background-color: var(--color-light);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+    }
+    
+    .order-items {
+        padding: var(--space-md);
+    }
+    
+    .summary-title {
+        font-size: 1.2rem;
+        color: var(--color-primary);
+        margin-bottom: var(--space-md);
+        padding-bottom: var(--space-sm);
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .summary-item {
+        display: flex;
+        align-items: center;
+        padding: var(--space-sm) 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .item-image {
+        width: 60px;
+        height: 60px;
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+        margin-right: var(--space-sm);
+        flex-shrink: 0;
+    }
+    
+    .item-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .item-details {
+        flex: 1;
+    }
+    
+    .item-name {
+        font-weight: 500;
+        margin-bottom: 4px;
+    }
+    
+    .item-variant {
+        font-size: 0.8rem;
+        color: var(--color-text-light);
+    }
+    
+    .item-quantity {
+        font-size: 0.9rem;
+    }
+    
+    .item-price {
+        font-weight: 600;
+        padding-left: var(--space-md);
+        text-align: right;
+    }
+    
+    .summary-subtotal {
+        padding: var(--space-md);
+    }
+    
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: var(--space-sm);
+    }
+    
+    .summary-row.total {
+        font-size: 1.1rem;
+        font-weight: 600;
+        padding-top: var(--space-sm);
+        margin-top: var(--space-sm);
+        border-top: 1px solid #e0e0e0;
+    }
+    
+    .summary-label {
+        color: var(--color-text-light);
+    }
+    
+    .summary-value {
+        font-weight: 500;
+    }
+    
+    .total-value {
+        color: var(--color-primary);
+    }
+    
+    .btn-checkout {
+        width: 100%;
+        padding: var(--space-sm);
+        background-color: var(--color-primary);
+        color: white;
+        border: none;
+        border-radius: var(--radius-md);
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .btn-checkout:hover {
+        background-color: var(--color-primary-dark);
+    }
+    
+    .checkout-action {
+        display: flex;
+        gap: var(--space-md);
+    }
+    
+    .btn-back {
+        padding: var(--space-sm) var(--space-md);
+        background-color: transparent;
+        color: var(--color-text);
+        border: 1px solid #e0e0e0;
+        border-radius: var(--radius-md);
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .btn-back:hover {
+        background-color: #f0f0f0;
+    }
+    
+    .btn-continue {
+        flex: 1;
+        padding: var(--space-sm) var(--space-md);
+        background-color: var(--color-primary);
+        color: white;
+        border: none;
+        border-radius: var(--radius-md);
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .btn-continue:hover {
+        background-color: var(--color-primary-dark);
+    }
+    
+    .coupon-form {
+        display: flex;
+        gap: var(--space-sm);
+        margin-top: var(--space-md);
+    }
+    
+    .coupon-input {
+        flex: 1;
+    }
+    
+    .btn-apply-coupon {
+        padding: 0.75rem var(--space-md);
+        background-color: var(--color-secondary);
+        color: white;
+        border: none;
+        border-radius: var(--radius-md);
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .btn-apply-coupon:hover {
+        background-color: var(--color-secondary-dark);
+    }
+    
+    .secure-checkout-info {
+        display: flex;
+        align-items: center;
+        margin-top: var(--space-md);
+        font-size: 0.9rem;
+        color: var(--color-text-light);
+    }
+    
+    .secure-checkout-info i {
+        margin-right: var(--space-xs);
+    }
+    
+    .payment-logos {
+        margin-top: var(--space-md);
+        display: flex;
+        gap: var(--space-sm);
+        justify-content: flex-end;
+    }
+    
+    .payment-logo {
+        width: 40px;
+        height: 24px;
+        opacity: 0.6;
+        transition: var(--transition);
+    }
+    
+    .payment-logo:hover {
+        opacity: 1;
+    }
+    
+    @media (max-width: 991px) {
+        .payment-method {
             width: 100%;
-            max-width: 600px;
-            text-align: center;
         }
-
-        h1 {
-            color: #333333;
-            font-size: 28px;
-            margin-bottom: 20px;
-        }
-
-        table {
+    }
+    
+    @media (max-width: 767px) {
+        .address-card, .new-address-btn {
             width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
         }
+        
+        .step-text {
+            font-size: 0.8rem;
+        }
+    }
+</style>
+{% endblock %}
 
-        table th, table td {
-            border: 1px solid #cccccc;
-            padding: 10px;
-            text-align: left;
-        }
-
-        table th {
-            background-color: #f4f4f9;
-        }
-
-        .btn {
-            display: inline-block;
-            background-color: #007BFF;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-size: 18px;
-        }
-
-        .btn:hover {
-            background-color: #0056b3;
-        }
-    </style>
-</head>
-<body>
+{% block content %}
+<!-- Breadcrumb -->
+<div class="breadcrumb-container">
     <div class="container">
-        <h1>Checkout</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Quantity</th>
-                    <th>Price</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in cart_items %}
-                <tr>
-                    <td>{{ item.product.name }}</td>
-                    <td>{{ item.quantity }}</td>
-                    <td>Rs {{ item.product.price }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <a href="{% url 'products:product_list' %}" class="btn">Confirm Order</a>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'products:product_list' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'products:cart' %}">Cart</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+            </ol>
+        </nav>
     </div>
-</body>
-</html>
+</div>
+
+<!-- Checkout Container -->
+<div class="checkout-container">
+    <div class="container">
+        <!-- Checkout Steps -->
+        <div class="checkout-steps" data-aos="fade-up">
+            <div class="step active">
+                <div class="step-circle">1</div>
+                <div class="step-text">Shipping</div>
+            </div>
+            <div class="step">
+                <div class="step-circle">2</div>
+                <div class="step-text">Payment</div>
+            </div>
+            <div class="step">
+                <div class="step-circle">3</div>
+                <div class="step-text">Review</div>
+            </div>
+            <div class="step">
+                <div class="step-circle">4</div>
+                <div class="step-text">Complete</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Left Column - Form -->
+            <div class="col-lg-8" data-aos="fade-up">
+                <!-- Shipping Information -->
+                <div class="checkout-card" id="shippingInfo">
+                    <h3 class="checkout-title">Shipping Information</h3>
+                    
+                    <div class="address-select">
+                        <div class="address-card selected">
+                            <span class="address-type">Home</span>
+                            <h4>John Doe</h4>
+                            <p>123 Main Street, Apt 4B</p>
+                            <p>New Delhi, 110001</p>
+                            <p>Phone: +91 9876543210</p>
+                        </div>
+                        
+                        <div class="address-card">
+                            <span class="address-type">Office</span>
+                            <h4>John Doe</h4>
+                            <p>456 Business Park, Building C</p>
+                            <p>New Delhi, 110001</p>
+                            <p>Phone: +91 9876543210</p>
+                        </div>
+                        
+                        <button class="new-address-btn" id="newAddressBtn">
+                            <div class="btn-add-icon">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <span>Add New Address</span>
+                        </button>
+                    </div>
+                    
+                    <div class="mt-4" id="newAddressForm" style="display: none;">
+                        <h4>Add New Address</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label required">Full Name</label>
+                                    <input type="text" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-label required">Phone Number</label>
+                                    <input type="tel" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label required">Address Line 1</label>
+                            <input type="text" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Address Line 2</label>
+                            <input type="text" class="form-control">
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-label required">City</label>
+                                    <input type="text" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-label required">State</label>
+                                    <select class="form-control" required>
+                                        <option value="">Select State</option>
+                                        <option>Delhi</option>
+                                        <option>Maharashtra</option>
+                                        <option>Karnataka</option>
+                                        <option>Tamil Nadu</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-label required">Postal Code</label>
+                                    <input type="text" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Address Type</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="addressType" id="homeAddress" value="home" checked>
+                                <label class="form-check-label" for="homeAddress">Home</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="addressType" id="officeAddress" value="office">
+                                <label class="form-check-label" for="officeAddress">Office</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="addressType" id="otherAddress" value="other">
+                                <label class="form-check-label" for="otherAddress">Other</label>
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="btn-continue">Save Address</button>
+                    </div>
+                    
+                    <h4 class="mt-4">Shipping Method</h4>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="shippingMethod" id="standardShipping" value="standard" checked>
+                        <label class="form-check-label" for="standardShipping">
+                            <div>Standard Shipping (3-5 business days)</div>
+                            <div class="text-muted small">Free</div>
+                        </label>
+                    </div>
+                    
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="shippingMethod" id="expressShipping" value="express">
+                        <label class="form-check-label" for="expressShipping">
+                            <div>Express Shipping (1-2 business days)</div>
+                            <div class="text-muted small">Rs 250</div>
+                        </label>
+                    </div>
+                    
+                    <div class="checkout-action mt-4">
+                        <a href="{% url 'products:cart' %}" class="btn-back">
+                            <i class="fas fa-arrow-left me-2"></i> Back to Cart
+                        </a>
+                        <button class="btn-continue" id="continueToPayment">
+                            Continue to Payment <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Payment Information (Initially Hidden) -->
+                <div class="checkout-card" id="paymentInfo" style="display: none;">
+                    <h3 class="checkout-title">Payment Method</h3>
+                    
+                    <div class="payment-methods">
+                        <div class="payment-method selected">
+                            <input type="radio" name="paymentMethod" id="creditCard" checked>
+                            <div class="payment-icon">
+                                <i class="far fa-credit-card"></i>
+                            </div>
+                            <div class="payment-details">
+                                <div class="payment-title">Credit/Debit Card</div>
+                                <div class="payment-description">Pay securely using your card</div>
+                            </div>
+                        </div>
+                        
+                        <div class="payment-method">
+                            <input type="radio" name="paymentMethod" id="upi">
+                            <div class="payment-icon">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo-vector.svg" alt="UPI">
+                            </div>
+                            <div class="payment-details">
+                                <div class="payment-title">UPI</div>
+                                <div class="payment-description">Pay using UPI apps like Google Pay, PhonePe</div>
+                            </div>
+                        </div>
+                        
+                        <div class="payment-method">
+                            <input type="radio" name="paymentMethod" id="netBanking">
+                            <div class="payment-icon">
+                                <i class="fas fa-university"></i>
+                            </div>
+                            <div class="payment-details">
+                                <div class="payment-title">Net Banking</div>
+                                <div class="payment-description">Pay using your bank account</div>
+                            </div>
+                        </div>
+                        
+                        <div class="payment-method">
+                            <input type="radio" name="paymentMethod" id="cod">
+                            <div class="payment-icon">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <div class="payment-details">
+                                <div class="payment-title">Cash on Delivery</div>
+                                <div class="payment-description">Pay when you receive your order</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Credit Card Form -->
+                    <div class="credit-card-inputs">
+                        <div class="form-group">
+                            <label class="form-label required">Card Number</label>
+                            <input type="text" class="form-control" placeholder="XXXX XXXX XXXX XXXX" required>
+                        </div>
+                        
+                        <div class="card-row">
+                            <div class="form-group flex-grow-1">
+                                <label class="form-label required">Name on Card</label>
+                                <input type="text" class="form-control" required>
+                            </div>
+                        </div>
+                        
+                        <div class="card-row">
+                            <div class="form-group">
+                                <label class="form-label required">Expiry Date</label>
+                                <input type="text" class="form-control" placeholder="MM/YY" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">CVV</label>
+                                <input type="text" class="form-control" placeholder="XXX" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="checkout-action mt-4">
+                        <button class="btn-back" id="backToShipping">
+                            <i class="fas fa-arrow-left me-2"></i> Back to Shipping
+                        </button>
+                        <button class="btn-continue" id="continueToReview">
+                            Review Order <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Order Review (Initially Hidden) -->
+                <div class="checkout-card" id="orderReview" style="display: none;">
+                    <h3 class="checkout-title">Review Your Order</h3>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5 class="mb-3">Shipping Information</h5>
+                            <div class="card p-3">
+                                <p class="mb-1"><strong>John Doe</strong></p>
+                                <p class="mb-1">123 Main Street, Apt 4B</p>
+                                <p class="mb-1">New Delhi, 110001</p>
+                                <p class="mb-0">Phone: +91 9876543210</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="mb-3">Payment Method</h5>
+                            <div class="card p-3">
+                                <p class="mb-1"><strong>Credit/Debit Card</strong></p>
+                                <p class="mb-0">Card ending with •••• 1234</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h5>Order Items</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                    <th class="text-end">Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cart_items %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="me-3" style="width:60px; height:60px; object-fit:cover; border-radius:4px;">
+                                            <span>{{ item.product.name }}</span>
+                                        </div>
+                                    </td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td class="text-end">Rs {{ item.product.price }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="checkout-action mt-4">
+                        <button class="btn-back" id="backToPayment">
+                            <i class="fas fa-arrow-left me-2"></i> Back to Payment
+                        </button>
+                        <button class="btn-continue" id="placeOrder">
+                            Place Order <i class="fas fa-check ms-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column - Order Summary -->
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="order-summary">
+                    <div class="order-items">
+                        <h4 class="summary-title">Order Summary</h4>
+                        {% for item in cart_items %}
+                        <div class="summary-item">
+                            <div class="item-image">
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                            </div>
+                            <div class="item-details">
+                                <div class="item-name">{{ item.product.name }}</div>
+                                <div class="item-quantity">Qty: {{ item.quantity }}</div>
+                            </div>
+                            <div class="item-price">Rs {{ item.product.price }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="summary-subtotal">
+                        <div class="summary-row">
+                            <div class="summary-label">Subtotal</div>
+                            <div class="summary-value">₹ {{ subtotal }}</div>
+                        </div>
+                        <div class="summary-row">
+                            <div class="summary-label">Shipping</div>
+                            <div class="summary-value">Free</div>
+                        </div>
+                        <div class="summary-row">
+                            <div class="summary-label">Tax (GST 18%)</div>
+                            <div class="summary-value">₹ {{ tax }}</div>
+                        </div>
+                        <div class="summary-row total">
+                            <div class="summary-label">Total</div>
+                            <div class="total-value">₹ {{ total }}</div>
+                        </div>
+                        
+                        <div class="coupon-form">
+                            <input type="text" class="form-control coupon-input" placeholder="Coupon Code">
+                            <button class="btn-apply-coupon">Apply</button>
+                        </div>
+                        
+                        <div class="secure-checkout-info mt-3">
+                            <i class="fas fa-lock"></i> Secure checkout with end-to-end encryption
+                        </div>
+                        
+                        <div class="payment-logos">
+                            <img src="https://cdn.iconscout.com/icon/free/png-256/visa-3-226460.png" alt="Visa" class="payment-logo">
+                            <img src="https://cdn.iconscout.com/icon/free/png-256/mastercard-3521564-2944982.png" alt="Mastercard" class="payment-logo">
+                            <img src="https://cdn.iconscout.com/icon/free/png-256/rupay-282878.png" alt="RuPay" class="payment-logo">
+                            <img src="https://cdn.iconscout.com/icon/free/png-256/paytm-226448.png" alt="Paytm" class="payment-logo">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Customer Support -->
+                <div class="checkout-card mt-4">
+                    <h5><i class="fas fa-headset me-2"></i> Need Help?</h5>
+                    <p class="mb-2">Our customer support is available 24/7</p>
+                    <p class="mb-2"><strong>Call us:</strong> +91 123 456 7890</p>
+                    <p class="mb-0"><strong>Email:</strong> support@arfurniture.com</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Show/hide new address form
+    const newAddressBtn = document.getElementById('newAddressBtn');
+    const newAddressForm = document.getElementById('newAddressForm');
+    
+    newAddressBtn.addEventListener('click', function() {
+        if (newAddressForm.style.display === 'none') {
+            newAddressForm.style.display = 'block';
+        } else {
+            newAddressForm.style.display = 'none';
+        }
+    });
+    
+    // Address selection
+    const addressCards = document.querySelectorAll('.address-card');
+    addressCards.forEach(card => {
+        card.addEventListener('click', function() {
+            addressCards.forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+        });
+    });
+    
+    // Payment method selection
+    const paymentMethods = document.querySelectorAll('.payment-method');
+    paymentMethods.forEach(method => {
+        method.addEventListener('click', function() {
+            paymentMethods.forEach(m => m.classList.remove('selected'));
+            this.classList.add('selected');
+            const radio = this.querySelector('input[type="radio"]');
+            radio.checked = true;
+            
+            // Show/hide credit card form based on selection
+            const creditCardInputs = document.querySelector('.credit-card-inputs');
+            if (radio.id === 'creditCard') {
+                creditCardInputs.style.display = 'block';
+            } else {
+                creditCardInputs.style.display = 'none';
+            }
+        });
+    });
+    
+    // Multi-step checkout process
+    const shippingInfo = document.getElementById('shippingInfo');
+    const paymentInfo = document.getElementById('paymentInfo');
+    const orderReview = document.getElementById('orderReview');
+    const steps = document.querySelectorAll('.step');
+    
+    document.getElementById('continueToPayment').addEventListener('click', function() {
+        shippingInfo.style.display = 'none';
+        paymentInfo.style.display = 'block';
+        orderReview.style.display = 'none';
+        
+        steps[0].classList.add('completed');
+        steps[1].classList.add('active');
+    });
+    
+    document.getElementById('backToShipping').addEventListener('click', function() {
+        shippingInfo.style.display = 'block';
+        paymentInfo.style.display = 'none';
+        orderReview.style.display = 'none';
+        
+        steps[0].classList.remove('completed');
+        steps[1].classList.remove('active');
+        steps[0].classList.add('active');
+    });
+    
+    document.getElementById('continueToReview').addEventListener('click', function() {
+        shippingInfo.style.display = 'none';
+        paymentInfo.style.display = 'none';
+        orderReview.style.display = 'block';
+        
+        steps[1].classList.add('completed');
+        steps[2].classList.add('active');
+    });
+    
+    document.getElementById('backToPayment').addEventListener('click', function() {
+        shippingInfo.style.display = 'none';
+        paymentInfo.style.display = 'block';
+        orderReview.style.display = 'none';
+        
+        steps[2].classList.remove('active');
+        steps[1].classList.remove('completed');
+        steps[1].classList.add('active');
+    });
+    
+    document.getElementById('placeOrder').addEventListener('click', function() {
+        steps[2].classList.add('completed');
+        steps[3].classList.add('active');
+        
+        // Simulate order placement
+        setTimeout(function() {
+            window.location.href = "{% url 'products:product_list' %}";
+        }, 1000);
+    });
+});
+</script>
 {% endblock %}
 
 

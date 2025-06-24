@@ -2,82 +2,571 @@
 {% load static %}
 
 {% block styles %}
-<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<style>
+    /* Product Detail Page Custom Styles */
+    .product-header {
+        padding: var(--space-lg) 0;
+        background-color: var(--color-light);
+    }
+    
+    .breadcrumb {
+        padding: var(--space-xs) 0;
+        margin-bottom: var(--space-md);
+    }
+    
+    .breadcrumb-item {
+        display: inline-block;
+        font-size: 0.9rem;
+    }
+    
+    .breadcrumb-item:not(:last-child):after {
+        content: '/';
+        margin: 0 var(--space-xs);
+        color: var(--color-text-light);
+    }
+    
+    /* Product Detail Layout */
+    .product-detail-layout {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: var(--space-lg);
+        align-items: start;
+    }
+    
+    .product-gallery {
+        position: relative;
+    }
+    
+    .product-image-large {
+        width: 100%;
+        height: auto;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-md);
+        object-fit: cover;
+        aspect-ratio: 1 / 1;
+    }
+    
+    .product-detail-card {
+        background-color: var(--color-white);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-md);
+        height: 100%;
+    }
+    
+    /* Product Actions */
+    .product-specs {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: var(--space-md);
+    }
+    
+    .spec-item {
+        margin-right: var(--space-md);
+        margin-bottom: var(--space-sm);
+        font-size: 0.9rem;
+        color: var(--color-text-light);
+        display: flex;
+        align-items: center;
+    }
+    
+    .spec-item i {
+        margin-right: 6px;
+        color: var(--color-primary);
+    }
+    
+    .quantity-selector {
+        display: flex;
+        align-items: center;
+        margin-bottom: var(--space-md);
+    }
+    
+    .quantity-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--color-border);
+        background: var(--color-white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 1.2rem;
+        transition: var(--transition);
+    }
+    
+    .quantity-btn:hover {
+        background-color: var(--color-light);
+    }
+    
+    .quantity-input {
+        width: 50px;
+        height: 36px;
+        text-align: center;
+        border: 1px solid var(--color-border);
+        border-left: 0;
+        border-right: 0;
+        font-size: 1rem;
+    }
+    
+    /* Custom background controller */
+    .ar-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-sm);
+        margin-top: var(--space-md);
+    }
+    
+    .ar-control-group {
+        background-color: var(--color-white);
+        padding: var(--space-sm);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .bg-option {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        margin: 0 5px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: var(--transition);
+    }
+    
+    .bg-option.active {
+        border-color: var(--color-primary);
+    }
+    
+    .model-loader {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: var(--space-sm);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+        display: none;
+    }
+    
+    .loading-spinner {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-left: 4px solid var(--color-secondary);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+    }
+    
+    /* AR Section */
+    .ar-container {
+        width: 100%;
+        margin: 0 auto;
+        overflow: hidden;
+    }
+    
+    model-viewer {
+        width: 100%;
+        height: 450px;
+        background-color: #F8F9FA;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-md);
+        --poster-color: transparent;
+    }
+    
+    .feature-card {
+        background-color: var(--color-white);
+        border-radius: var(--radius-md);
+        padding: var(--space-md);
+        box-shadow: var(--shadow-sm);
+        height: 100%;
+        text-align: center;
+    }
+    
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto var(--space-md);
+        background-color: rgba(42, 59, 76, 0.05);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: var(--color-secondary);
+    }
+    
+    /* Product Grid */
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: var(--space-md);
+        margin-top: var(--space-lg);
+    }
+    
+    .product-card {
+        background-color: var(--color-white);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+    }
+    
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .product-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+    
+    .product-info {
+        padding: var(--space-md);
+    }
+    
+    .product-info h3 {
+        font-size: 1.1rem;
+        margin-bottom: var(--space-xs);
+    }
+    
+    .product-info h3 a {
+        color: var(--color-text);
+        text-decoration: none;
+    }
+    
+    .product-price {
+        display: block;
+        font-weight: 600;
+        color: var(--color-primary);
+        margin-bottom: var(--space-sm);
+    }
+    
+    .product-buttons {
+        display: flex;
+        gap: var(--space-xs);
+    }
+    
+    .product-buttons .btn {
+        flex: 1;
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .ar-button {
+        width: 40px;
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Mobile optimizations */
+    @media (max-width: 768px) {
+        .product-detail-layout {
+            grid-template-columns: 1fr;
+            gap: var(--space-md);
+        }
+        
+        .product-actions {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+        
+        .d-flex.gap-2 {
+            flex-direction: column;
+            width: 100%;
+        }
+        
+        .btn-large {
+            width: 100%;
+            margin-bottom: var(--space-xs);
+        }
+        
+        model-viewer {
+            height: 350px;
+        }
+        
+        .ar-controls {
+            justify-content: center;
+        }
+        
+        .feature-card {
+            padding: var(--space-sm);
+        }
+        
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.3rem;
+        }
+        
+        .feature-title {
+            font-size: 1.1rem;
+        }
+        
+        .product-grid {
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: var(--space-sm);
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .breadcrumb {
+            font-size: 0.8rem;
+        }
+        
+        .product-image-large {
+            height: auto;
+            aspect-ratio: 4/3;
+        }
+        
+        model-viewer {
+            height: 250px;
+        }
+        
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1.1rem;
+        }
+        
+        .feature-title {
+            font-size: 1rem;
+        }
+        
+        .notification {
+            left: 20px;
+            right: 20px;
+            transform: translateY(-100%);
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
 {% endblock %}
+
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>{{ product.name }}</title>
-  <!-- Include Model Viewer for AR -->
-  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
-  <script src="https://kit.fontawesome.com/c92e7412c5.js" crossorigin="anonymous"></script>
+<!-- Product Header Section -->
+<section class="product-header">
+    <div class="container">
+        <div class="breadcrumb">
+            <span class="breadcrumb-item"><a href="{% url 'products:product_list' %}">Home</a></span>
+            <span class="breadcrumb-item"><a href="#products">Products</a></span>
+            <span class="breadcrumb-item">{{ product.name }}</span>
+        </div>
+    </div>
+</section>
 
-  <style>
-    .cart-icon {
-        position: relative; /* Position relative for the count */
-        font-size: 28px; /* Increased font size */
-    }
+<!-- Product Detail Section -->
+<section class="product-detail-section">
+    <div class="container">
+        <div class="product-detail-layout">
+            <!-- Product Image Gallery -->
+            <div class="product-gallery" data-aos="fade-right">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image-large">
+                
+                <!-- We could add thumbnails here if multiple product images were available -->
+                <!-- <div class="product-thumbnails">
+                    <div class="thumbnail active">
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                    </div>
+                </div> -->
+            </div>
+            
+            <!-- Product Info -->
+            <div class="product-detail-card" data-aos="fade-left">
+                <div class="p-4">
+                    <h1 class="mb-2">{{ product.name }}</h1>
+                    <span class="product-price mb-3">Rs {{ product.price }}</span>
+                    
+                    <div class="product-specs">
+                        <div class="spec-item"><i class="fa-solid fa-star"></i> Premium Quality</div>
+                        <div class="spec-item"><i class="fa-solid fa-truck"></i> Free Shipping</div>
+                        <div class="spec-item"><i class="fa-solid fa-rotate-left"></i> 30-Day Returns</div>
+                    </div>
+                    
+                    <p class="mb-4">{{ product.description }}</p>
+                    
+                    <div class="product-actions">
+                        <div class="quantity-selector">
+                            <button class="quantity-btn" onclick="decrementQuantity()">-</button>
+                            <input type="text" value="1" class="quantity-input" id="quantity" readonly>
+                            <button class="quantity-btn" onclick="incrementQuantity()">+</button>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-primary btn-large" id="add-to-cart-btn" data-product-id="{{ product.pk }}">
+                                <i class="fa-solid fa-cart-plus me-2"></i> Add to Cart
+                            </button>
+                            <a href="{% url 'products:product_payment_page' product.pk %}" class="btn btn-secondary btn-large">
+                                <i class="fa-solid fa-credit-card me-2"></i> Buy Now
+                            </a>
+                        </div>
+                        
+                        <a href="#ar-view" class="btn btn-outline mt-3 w-100">
+                            <i class="fa-solid fa-cube me-2"></i> View in Your Space
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-    .cart-count {
-        position: absolute; /* Position absolute for the count */
-        top: -10px; /* Move the count to the top-right corner */
-        right: -10px; /* Move the count to the top-right corner */
-        background-color: red; /* Background color for the count */
-        color: white; /* Text color for the count */
-        border-radius: 50%; /* Rounded corners for the count */
-        padding: 2px 6px; /* Padding for the count */
-        font-size: 12px; /* Font size for the count */
-    }
-  </style>
-</head>
-<body>
-  <div class="wrapper">
-    <!-- Header with Navigation -->
-    <header>
-        <nav class="navbar">
-          <a href="{% url 'products:product_list' %}" class="logo">Furniture Store</a>
-          <ul class="nav-links">
-            <li><a href="{% url 'products:product_list' %}" class="active">Home</a></li>
-            <li><a href="#">Shop</a></li>
-            <li><a href="{% url 'products:about' %}">About</a></li>
-            <li><a href="{% url 'products:contact' %}">Contact</a></li>
-            <li>
-                <a href="{% url 'products:view_cart' %}" class="cart-icon" style="color: #ffffff;">
-                  <i class="fa-solid fa-cart-shopping fa-xl"></i>
+<!-- AR Section -->
+<section id="ar-view" class="ar-section">
+    <div class="container">
+        <div class="section-title" data-aos="fade-up">
+            <span>AUGMENTED REALITY</span>
+            <h2>Experience {{ product.name }} in Your Space</h2>
+            <p class="text-center">Use your mobile device to place this item in your room and see how it looks in real life.</p>
+        </div>
+        
+        <div class="ar-container position-relative" data-aos="fade-up">
+            <div class="model-loader" id="model-loader">
+                <div class="loading-spinner"></div>
+            </div>
+            
+            <model-viewer 
+                src="{{ product.model_3d.url }}"
+                alt="A 3D model of {{ product.name }}"
+                ar
+                ar-modes="webxr scene-viewer quick-look"
+                camera-controls
+                shadow-intensity="1"
+                exposure="0.7"
+                auto-rotate
+                loading="eager"
+                reveal="auto"
+                id="product-model-viewer"
+                data-js-focus-visible>
+                <div slot="progress-bar" class="progress-bar hide" id="progress-bar">
+                    <div class="update-bar"></div>
+                </div>
+            </model-viewer>
+            
+            <div class="ar-controls">
+                <div class="ar-control-group">
+                    <p class="mb-2 fw-bold">Background:</p>
+                    <div class="bg-option active" style="background-color: #F8F9FA;" data-color="#F8F9FA"></div>
+                    <div class="bg-option" style="background-color: #FFFFFF;" data-color="#FFFFFF"></div>
+                    <div class="bg-option" style="background-color: #E9ECEF;" data-color="#E9ECEF"></div>
+                    <div class="bg-option" style="background-color: #2A3B4C;" data-color="#2A3B4C"></div>
+                </div>
+                
+                <div class="ar-control-group">
+                    <button class="btn btn-sm btn-primary" id="ar-fullscreen">
+                        <i class="fa-solid fa-expand me-1"></i> Fullscreen
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-5 g-4">
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-mobile-screen"></i>
+                    </div>
+                    <h3 class="feature-title">Use Your Device</h3>
+                    <p class="feature-desc">Open this page on your mobile device and tap "View in AR" to place the product in your space.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-arrows-up-down-left-right"></i>
+                    </div>
+                    <h3 class="feature-title">Move & Resize</h3>
+                    <p class="feature-desc">Use touch gestures to place, resize, and rotate the furniture until it fits perfectly in your space.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-camera"></i>
+                    </div>
+                    <h3 class="feature-title">Share & Save</h3>
+                    <p class="feature-desc">Take screenshots to save or share with friends and family before making your purchase.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-                    <span class="cart-count">{{ total_items|default:0 }}</span>
+<!-- Related Products -->
+<section class="product-section">
+    <div class="container">
+        <div class="section-title" data-aos="fade-up">
+            <span>YOU MIGHT ALSO LIKE</span>
+            <h2>Recommended Products</h2>
+        </div>
+        
+        <div class="product-grid">
+            {% for product in recommended_products %}
+            <div class="product-card" data-aos="fade-up">
+                <a href="{% url 'products:product_detail' product.pk %}">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
                 </a>
-            </li>
-          </ul>
-          <div class="menu-btn">&#9776;</div>
-        </nav>
-      </header>
-      
-      <script>
-        // Toggle Mobile Menu
-        document.querySelector(".menu-btn").addEventListener("click", function() {
-          document.querySelector(".nav-links").classList.toggle("active");
-        });
-      </script>
+                <div class="product-info">
+                    <h3><a href="{% url 'products:product_detail' product.pk %}">{{ product.name }}</a></h3>
+                    <span class="product-price">Rs {{ product.price }}</span>
+                    <div class="product-buttons">
+                        <a href="{% url 'products:product_detail' product.pk %}" class="btn btn-primary">View Details</a>
+                        <a href="{% url 'products:product_detail' product.pk %}#ar-view" class="btn btn-secondary ar-button">
+                            <i class="fa-solid fa-cube"></i> AR
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
 
-    <!-- Main Content -->
-    <main class="container content">
-      <!-- Product Detail Section -->
-      <section class="product-detail">
-        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img">
-        <div class="product-info">
-          <h2>{{ product.name }}</h2>
-          <p class="description">{{ product.description }}</p>
-          <p class="price">Rs {{ product.price }}</p>
-          <div class="btn1">
-            <button class="btn" id="add-to-cart-btn" data-product-id="{{ product.pk }}">Add to Cart</button>
-          </div>
-          <script>
-            document.getElementById('add-to-cart-btn').addEventListener('click', function () {
+<!-- Load model-viewer Web Component -->
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Quantity selector
+    function incrementQuantity() {
+        const input = document.getElementById('quantity');
+        input.value = parseInt(input.value) + 1;
+    }
+    
+    function decrementQuantity() {
+        const input = document.getElementById('quantity');
+        if (parseInt(input.value) > 1) {
+            input.value = parseInt(input.value) - 1;
+        }
+    }
+    
+    // Add to cart functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const addToCartBtn = document.getElementById('add-to-cart-btn');
+        
+        if (addToCartBtn) {
+            addToCartBtn.addEventListener('click', function() {
                 const productId = this.getAttribute('data-product-id');
+                const quantity = document.getElementById('quantity').value;
+                
                 fetch(`/product/${productId}/add-to-cart/`, {
                     method: 'GET',
                     headers: {
@@ -87,72 +576,156 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        const cartIcon = document.querySelector('.cart-icon .cart-count');
-                        cartIcon.textContent = data.total_items; // Update the cart count dynamically
+                        // Update cart count
+                        const cartCountElements = document.querySelectorAll('.cart-count');
+                        cartCountElements.forEach(elem => {
+                            elem.textContent = data.total_items;
+                        });
+                        
+                        // Show success notification
+                        showNotification('Product added to cart!', 'success');
                     }
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Failed to add product to cart.', 'error');
+                });
             });
-          </script>
-          <div class="btn1">
-            <a href="{% url 'products:product_payment_page' product.pk %}" class="btn">Buy</a>
-          </div>
-        </div>
-      </section>
-
-      <!-- AR Section -->
-      <section class="ar-section">
-        <h2>View in Augmented Reality</h2>
-        <div class="ar-container">
-          <model-viewer 
-            src="{{ product.model_3d.url }}"
-            alt="A 3D model of {{ product.name }}"
-            ar
-            ar-modes="webxr scene-viewer quick-look"
-            camera-controls
-            auto-rotate>
-          </model-viewer>
-          <div class="color-picker">
-            <label for="bg-color">Change Background Color:</label>
-            <input type="color" id="bg-color" value="#ffffff">
-          </div>
-        </div>
-      </section>
-      <script>
-        // Add event listener for the background color picker
-        document.getElementById('bg-color').addEventListener('input', (event) => {
-            const modelViewer = document.querySelector('model-viewer');
-            modelViewer.style.backgroundColor = event.target.value;
+        }
+        
+        // AR Background color options
+        const bgOptions = document.querySelectorAll('.bg-option');
+        const modelViewer = document.getElementById('product-model-viewer');
+        
+        bgOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const color = this.getAttribute('data-color');
+                
+                // Set background color
+                if (modelViewer) {
+                    modelViewer.style.backgroundColor = color;
+                }
+                
+                // Update active state
+                bgOptions.forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+            });
         });
-      </script>
-
-      <!-- Recommended Products Section -->
-      <section class="recommended-products">
-        <h2>Recommended Products</h2>
-        <div class="product-list">
-          {% for product in recommended_products %}
-            <div class="product-card">
-              <a href="{% url 'products:product_detail' product.pk %}">
-                <img src="{{ product.image.url }}" alt="{{ product.name }}" width="150">
-                <h3>{{ product.name }}</h3>
-              </a>
-              <p>Rs {{ product.price }}</p>
+        
+        // Fullscreen button
+        const fullscreenBtn = document.getElementById('ar-fullscreen');
+        if (fullscreenBtn && modelViewer) {
+            fullscreenBtn.addEventListener('click', function() {
+                if (modelViewer.requestFullscreen) {
+                    modelViewer.requestFullscreen();
+                } else if (modelViewer.webkitRequestFullscreen) {
+                    modelViewer.webkitRequestFullscreen();
+                } else if (modelViewer.msRequestFullscreen) {
+                    modelViewer.msRequestFullscreen();
+                }
+            });
+        }
+        
+        // Show loading indicator
+        const modelLoader = document.getElementById('model-loader');
+        if (modelLoader && modelViewer) {
+            // Show loader initially
+            modelLoader.style.display = 'block';
+            
+            // Hide loader when the model is loaded
+            modelViewer.addEventListener('load', function() {
+                modelLoader.style.display = 'none';
+                modelViewer.setAttribute('loaded', 'true');
+            });
+            
+            // Handle model loading error
+            modelViewer.addEventListener('error', function(event) {
+                modelLoader.style.display = 'none';
+                console.error('Error loading 3D model:', event);
+                showNotification('Failed to load 3D model. Please try again.', 'error');
+            });
+            
+            // Add a fallback to hide the loader after 8 seconds in case the load event doesn't fire
+            setTimeout(function() {
+                if (modelLoader.style.display === 'block') {
+                    modelLoader.style.display = 'none';
+                    modelViewer.setAttribute('loaded', 'true');
+                }
+            }, 8000);
+        }
+    });
+    
+    // Notification function
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <i class="fa-solid ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                <span>${message}</span>
             </div>
-          {% endfor %}
-        </div>
-      </section>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Animate in
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 10);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }, 3000);
+    }
+</script>
 
-      <!-- Back Button -->
-      <div class="back-btn">
-        <a href="{% url 'products:product_list' %}" class="btn">Back to Products</a>
-      </div>
-    </main>
-
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2023 Furniture Store. All rights reserved.</p>
-    </footer>
-  </div>
-</body>
-</html>
+<style>
+    /* Notification styles */
+    .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 8px;
+        background-color: white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        z-index: 9999;
+        transform: translateX(120%);
+        transition: transform 0.3s ease-in-out;
+    }
+    
+    .notification.show {
+        transform: translateX(0);
+    }
+    
+    .notification.success {
+        border-left: 4px solid var(--color-success);
+    }
+    
+    .notification.error {
+        border-left: 4px solid var(--color-error);
+    }
+    
+    .notification-content {
+        display: flex;
+        align-items: center;
+    }
+    
+    .notification-content i {
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+    
+    .notification.success i {
+        color: var(--color-success);
+    }
+    
+    .notification.error i {
+        color: var(--color-error);
+    }
+</style>
 {% endblock %}

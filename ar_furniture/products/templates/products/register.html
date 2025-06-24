@@ -2,170 +2,546 @@
 {% load static %}
 
 {% block styles %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Signup</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+<style>
+    /* Custom styles for Register page */
+    .auth-container {
+        min-height: 100vh;
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    .auth-image {
+        flex: 1;
+        background: linear-gradient(rgba(42, 59, 76, 0.7), rgba(42, 59, 76, 0.4)), 
+                    url('https://images.unsplash.com/photo-1618220179428-22790b461013?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1227&q=80') center/cover no-repeat;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: var(--space-xl);
+        color: var(--color-white);
+    }
+    
+    .auth-image-content {
+        max-width: 500px;
+    }
+    
+    .auth-image h2 {
+        font-size: 2.5rem;
+        margin-bottom: var(--space-md);
+        color: var(--color-white);
+    }
+    
+    .auth-image p {
+        font-size: 1.1rem;
+        margin-bottom: var(--space-lg);
+        opacity: 0.9;
+    }
+    
+    .feature-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .feature-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: var(--space-md);
+    }
+    
+    .feature-icon {
+        width: 36px;
+        height: 36px;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        margin-right: var(--space-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .auth-form {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: var(--space-xl);
+        min-width: 300px;
+    }
+    
+    .auth-card {
+        max-width: 500px;
+        width: 100%;
+        margin: 0 auto;
+    }
+    
+    .auth-header {
+        text-align: center;
+        margin-bottom: var(--space-lg);
+    }
+    
+    .auth-header h1 {
+        font-size: 2rem;
+        margin-bottom: var(--space-sm);
+        color: var(--color-primary);
+    }
+    
+    .auth-header p {
+        color: var(--color-text-light);
+    }
+    
+    .social-auth {
+        margin-bottom: var(--space-lg);
+    }
+    
+    .social-auth-title {
+        text-align: center;
+        margin-bottom: var(--space-md);
+        font-size: 1rem;
+        color: var(--color-text-light);
+    }
+    
+    .social-auth-buttons {
+        display: flex;
+        gap: var(--space-sm);
+    }
+    
+    .social-auth-button {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-sm);
+        border: 1px solid #e0e0e0;
+        border-radius: var(--radius-md);
+        background-color: var(--color-white);
+        color: var(--color-text);
+        font-weight: 500;
+        transition: var(--transition);
+        text-decoration: none;
+    }
+    
+    .social-auth-button i {
+        margin-right: var(--space-xs);
+        font-size: 1.2rem;
+    }
+    
+    .social-auth-button:hover {
+        box-shadow: var(--shadow-sm);
+        transform: translateY(-2px);
+    }
+    
+    .social-auth-button.google:hover {
+        color: #DB4437;
+    }
+    
+    .social-auth-button.facebook:hover {
+        color: #4267B2;
+    }
+    
+    .divider {
+        display: flex;
+        align-items: center;
+        margin: var(--space-md) 0;
+        color: var(--color-text-light);
+        font-size: 0.9rem;
+    }
+    
+    .divider:before,
+    .divider:after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background-color: #e0e0e0;
+    }
+    
+    .divider span {
+        padding: 0 var(--space-sm);
+    }
+    
+    .form-group {
+        margin-bottom: var(--space-md);
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: var(--space-xs);
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: var(--color-text);
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #e0e0e0;
+        border-radius: var(--radius-md);
+        font-size: 1rem;
+        transition: var(--transition);
+    }
+    
+    .form-control:focus {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(42, 59, 76, 0.1);
+        outline: none;
+    }
+    
+    .password-input-group {
+        position: relative;
+    }
+    
+    .password-toggle {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--color-text-light);
+        cursor: pointer;
+    }
+    
+    .password-strength {
+        height: 5px;
+        background-color: #e0e0e0;
+        border-radius: 3px;
+        margin-top: var(--space-xs);
+        overflow: hidden;
+    }
+    
+    .strength-meter {
+        height: 100%;
+        width: 0;
+        transition: width 0.3s, background-color 0.3s;
+    }
+    
+    .password-feedback {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        margin-top: 5px;
+    }
+    
+    .feedback-text {
+        color: var(--color-text-light);
+    }
+    
+    .auth-footer {
+        margin-top: var(--space-md);
+        text-align: center;
+        font-size: 0.9rem;
+    }
+    
+    .auth-footer a {
+        color: var(--color-primary);
+        font-weight: 500;
+        text-decoration: none;
+    }
+    
+    .auth-footer a:hover {
+        text-decoration: underline;
+    }
+    
+    .required:after {
+        content: ' *';
+        color: var(--color-error);
+    }
+    
+    .checkbox-container {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: var(--space-md);
+    }
+    
+    .checkbox-container input {
+        margin-top: 5px;
+        margin-right: var(--space-xs);
+    }
+    
+    .terms-text {
+        font-size: 0.85rem;
+        color: var(--color-text-light);
+    }
+    
+    .error-feedback {
+        color: var(--color-error);
+        font-size: 0.85rem;
+        margin-top: 5px;
+    }
+    
+    .btn-auth {
+        width: 100%;
+        padding: 0.75rem;
+        background-color: var(--color-primary);
+        color: white;
+        border: none;
+        border-radius: var(--radius-md);
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .btn-auth:hover {
+        background-color: var(--color-primary-dark);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .alert-messages {
+        padding: var(--space-sm);
+        border-radius: var(--radius-md);
+        margin-bottom: var(--space-md);
+        background-color: #fef2f2;
+        border: 1px solid #fee2e2;
+        color: #b91c1c;
+    }
+    
+    @media (max-width: 991px) {
+        .auth-image {
+            display: none;
         }
+    }
+</style>
+{% endblock %}
 
-        .container {
-            background-color: #ffffff;
-            padding: 60px 70px; /* Increased padding for a larger form */
-            border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Larger shadow for emphasis */
-            width: 100%;
-            max-width: 700px; /* Increased max-width for a larger form */
-            box-sizing: border-box;
-        }
-
-        h2 {
-            text-align: center;
-            color: #333333;
-            font-size: 36px; /* Increased font size for the heading */
-            margin-bottom: 40px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 15px;
-            font-weight: bold;
-            color: #555555;
-            font-size: 22px; /* Increased font size for labels */
-        }
-
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 20px; /* Increased padding for inputs */
-            margin-bottom: 30px;
-            border: 1px solid #cccccc;
-            border-radius: 10px;
-            font-size: 20px; /* Increased font size for inputs */
-            box-sizing: border-box;
-        }
-
-        button {
-            width: 100%;
-            padding: 20px; /* Increased padding for the button */
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 22px; /* Increased font size for the button */
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        .messages {
-            margin-top: 25px;
-            color: red;
-            font-size: 20px; /* Increased font size for messages */
-        }
-
-        a {
-            display: block;
-            text-align: center;
-            margin-top: 25px;
-            color: #007BFF;
-            font-size: 20px; /* Increased font size for the link */
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .container {
-                padding: 50px 60px;
-                max-width: 95%; /* Adjusted for tablets */
-            }
-
-            h2 {
-                font-size: 32px;
-            }
-
-            label {
-                font-size: 20px;
-            }
-
-            input[type="text"], input[type="password"] {
-                padding: 18px;
-                font-size: 18px;
-            }
-
-            button {
-                font-size: 20px;
-                padding: 18px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 40px 50px;
-                max-width: 100%; /* Adjusted for mobile devices */
-            }
-
-            h2 {
-                font-size: 30px;
-            }
-
-            label {
-                font-size: 18px;
-            }
-
-            input[type="text"], input[type="password"] {
-                padding: 16px;
-                font-size: 18px;
-            }
-
-            button {
-                font-size: 18px;
-                padding: 16px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Signup</h2>
-        <form method="POST">
-            {% csrf_token %}
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-
-            <label for="confirm_password">Confirm Password:</label>
-            <input type="password" id="confirm_password" name="confirm_password" required>
-
-            <button type="submit">Signup</button>
-        </form>
-        {% if messages %}
-            <div class="messages">
-                <ul>
-                    {% for message in messages %}
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
-        <a href="{% url 'products:login' %}">Already have an account? Login</a>
+{% block content %}
+<div class="auth-container">
+    <div class="auth-image" data-aos="fade-right">
+        <div class="auth-image-content">
+            <h2>Welcome to AR Furniture</h2>
+            <p>Join our community and experience the future of furniture shopping with augmented reality technology.</p>
+            
+            <ul class="feature-list">
+                <li class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-cube"></i>
+                    </div>
+                    <span>Visualize furniture in your space before buying</span>
+                </li>
+                <li class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-percent"></i>
+                    </div>
+                    <span>Get exclusive discounts as a registered member</span>
+                </li>
+                <li class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <span>Save your favorite items for later</span>
+                </li>
+                <li class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <span>Track orders and manage deliveries</span>
+                </li>
+            </ul>
+        </div>
     </div>
-</body>
-</html>
+    
+    <div class="auth-form" data-aos="fade-left">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>Create an Account</h1>
+                <p>Sign up to get started with AR Furniture</p>
+            </div>
+            
+            {% if messages %}
+                <div class="alert-messages">
+                    <ul style="margin: 0; padding-left: 20px;">
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            
+            <div class="social-auth">
+                <div class="social-auth-title">Sign up with</div>
+                <div class="social-auth-buttons">
+                    <a href="#" class="social-auth-button google">
+                        <i class="fab fa-google"></i> Google
+                    </a>
+                    <a href="#" class="social-auth-button facebook">
+                        <i class="fab fa-facebook-f"></i> Facebook
+                    </a>
+                </div>
+            </div>
+            
+            <div class="divider">
+                <span>or sign up with email</span>
+            </div>
+            
+            <form method="POST" id="registerForm">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="first_name" class="form-label required">First Name</label>
+                            <input type="text" id="first_name" name="first_name" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="last_name" class="form-label required">Last Name</label>
+                            <input type="text" id="last_name" name="last_name" class="form-control" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email" class="form-label required">Email Address</label>
+                    <input type="email" id="email" name="email" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="username" class="form-label required">Username</label>
+                    <input type="text" id="username" name="username" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="form-label required">Password</label>
+                    <div class="password-input-group">
+                        <input type="password" id="password" name="password" class="form-control" required>
+                        <button type="button" class="password-toggle" id="togglePassword">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="password-strength">
+                        <div class="strength-meter" id="strengthMeter"></div>
+                    </div>
+                    <div class="password-feedback">
+                        <span class="feedback-text" id="passwordFeedback">Password strength</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm_password" class="form-label required">Confirm Password</label>
+                    <div class="password-input-group">
+                        <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
+                        <button type="button" class="password-toggle" id="toggleConfirmPassword">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="checkbox-container">
+                    <input type="checkbox" id="terms" name="terms" required>
+                    <div class="terms-text">
+                        I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-auth">
+                    Create Account
+                </button>
+            </form>
+            
+            <div class="auth-footer">
+                Already have an account? <a href="{% url 'products:login' %}">Sign in</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Password visibility toggle
+        const togglePassword = document.getElementById('togglePassword');
+        const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirm_password');
+        
+        togglePassword.addEventListener('click', function() {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+        
+        toggleConfirmPassword.addEventListener('click', function() {
+            const type = confirmPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+            confirmPassword.setAttribute('type', type);
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+        
+        // Password strength meter
+        const strengthMeter = document.getElementById('strengthMeter');
+        const passwordFeedback = document.getElementById('passwordFeedback');
+        
+        password.addEventListener('input', function() {
+            const val = password.value;
+            const result = calculatePasswordStrength(val);
+            
+            // Update the strength meter
+            strengthMeter.style.width = result.score + '%';
+            strengthMeter.style.backgroundColor = result.color;
+            passwordFeedback.textContent = result.feedback;
+        });
+        
+        function calculatePasswordStrength(password) {
+            // Basic password strength calculation
+            let score = 0;
+            let feedback = "Password strength";
+            let color = "#e0e0e0";
+            
+            if (password.length === 0) {
+                return { score: 0, feedback: feedback, color: color };
+            }
+            
+            // Length check
+            if (password.length > 8) {
+                score += 25;
+            } else if (password.length > 5) {
+                score += 10;
+            }
+            
+            // Complexity checks
+            if (/[A-Z]/.test(password)) score += 20; // Has uppercase
+            if (/[a-z]/.test(password)) score += 10; // Has lowercase
+            if (/[0-9]/.test(password)) score += 20; // Has number
+            if (/[^A-Za-z0-9]/.test(password)) score += 25; // Has special char
+            
+            // Cap the score at 100
+            score = Math.min(score, 100);
+            
+            // Set feedback and color based on score
+            if (score >= 80) {
+                feedback = "Strong password";
+                color = "#4CAF50"; // Green
+            } else if (score >= 50) {
+                feedback = "Moderate password";
+                color = "#FFC107"; // Yellow
+            } else {
+                feedback = "Weak password";
+                color = "#F44336"; // Red
+            }
+            
+            return { score: score, feedback: feedback, color: color };
+        }
+        
+        // Form validation
+        const form = document.getElementById('registerForm');
+        
+        form.addEventListener('submit', function(event) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            
+            if (password !== confirmPassword) {
+                event.preventDefault();
+                alert('Passwords do not match!');
+                return false;
+            }
+            
+            return true;
+        });
+    });
+</script>
 {% endblock %}

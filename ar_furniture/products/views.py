@@ -9,15 +9,29 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from django.db.models import Sum
 from django.http import JsonResponse
+import json
 
 
 def product_list(request):
     products = Product.objects.all()
+    total_items = get_cart_count(request)
+    return render(request, 'products/product_list.html', {'products': products, 'total_items': total_items})
+
+
+def get_cart_count(request):
+    """Get the total number of items in cart for both authenticated and guest users"""
     total_items = 0
     if request.user.is_authenticated:
         cart, created = Cart.objects.get_or_create(user=request.user)
         total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum'] or 0
-    return render(request, 'products/product_list.html', {'products': products, 'total_items': total_items})
+    else:
+        # For guest users, get cart from session
+        session_cart = request.session.get('cart', {})
+        for item_quantity in session_cart.values():
+            total_items += item_quantity
+    
+    return total_items
+
 
 def recommend_products(product_id):
     products = Product.objects.all()
@@ -39,23 +53,23 @@ def recommend_products(product_id):
     similar_indices = similarity_scores.argsort()[-6:-1][::-1]  # Top 5 similar products
     return [product_list[i] for i in similar_indices]
 
+
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)
     recommended_products = recommend_products(pk)
-    total_items = 0
-    if request.user.is_authenticated:
-        cart, created = Cart.objects.get_or_create(user=request.user)
-        total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum'] or 0
+    total_items = get_cart_count(request)
     return render(request, 'products/product_detail.html', {
         'product': product,
         'recommended_products': recommended_products,
         'total_items': total_items
     })
 
+
 @login_required
 def buy_product(request, pk):
     product = get_object_or_404(Product, pk=pk)
     return redirect('products:product_payment_page', pk=product.id)  # Redirect to the payment page for the specific product
+
 
 @login_required
 def checkout(request, pk):
@@ -71,52 +85,116 @@ def checkout(request, pk):
             return redirect('products:product_list')  # Redirect to product list after successful order
     return render(request, 'products/checkout.html', {'product': product})
 
+
 @login_required
 def order_confirmation(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
     return render(request, 'products/order_confirmation.html', {'order': order})
 
-@login_required
+
 def add_to_cart(request, pk):
     product = get_object_or_404(Product, pk=pk)
-    cart, created = Cart.objects.get_or_create(user=request.user)
-    cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
-    if not created:
-        cart_item.quantity += 1
-        cart_item.save()
-    total_items = CartItem.objects.filter(cart=cart).aggregate(Sum('quantity'))['quantity__sum'] or 0
+    if request.user.is_authenticated:
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+        if not created:
+            cart_item.quantity += 1
+            cart_item.save()
+    else:
+        # For guest users, add to session cart
+        session_cart = request.session.get('cart', {})
+        session_cart[str(pk)] = session_cart.get(str(pk), 0) + 1
+        request.session['cart'] = session_cart
+
+    total_items = get_cart_count(request)
     return JsonResponse({'success': True, 'total_items': total_items})
 
-@login_required
+
 def view_cart(request):
-    cart, created = Cart.objects.get_or_create(user=request.user)
-    cart_items = CartItem.objects.filter(cart=cart)
-    total_items = cart_items.aggregate(Sum('quantity'))['quantity__sum'] or 0
-    return render(request, 'products/cart.html', {'cart_items': cart_items, 'total_items': total_items})
+    if request.user.is_authenticated:
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        cart_items = CartItem.objects.filter(cart=cart)
+        total = sum(item.product.price * item.quantity for item in cart_items)
+        cart_items = list(cart_items)  # Convert queryset to list for consistent template handling
+    else:
+        # For guest users, retrieve cart from session
+        session_cart = request.session.get('cart', {})
+        cart_items = []
+        total = 0
+        for product_id, quantity in session_cart.items():
+            try:
+                product = Product.objects.get(pk=product_id)
+                item_total = product.price * quantity
+                total += item_total
+                cart_items.append({
+                    'id': product_id,  # Use product_id as cart item id for guest carts
+                    'product': product,
+                    'quantity': quantity,
+                    'get_total': item_total
+                })
+            except Product.DoesNotExist:
+                # Remove invalid products from cart
+                del session_cart[product_id]
+                request.session['cart'] = session_cart
 
-@login_required
+    total_items = get_cart_count(request)
+    return render(request, 'products/cart.html', {
+        'cart_items': cart_items,
+        'cart_total': total,
+        'total_items': total_items
+    })
+
+
 def remove_from_cart(request, item_id):
-    cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
-    cart_item.delete()
-    messages.success(request, f"{cart_item.product.name} has been removed from your cart.")
+    if request.user.is_authenticated:
+        cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
+        cart_item.delete()
+        messages.success(request, f"{cart_item.product.name} has been removed from your cart.")
+    else:
+        # For guest users, remove from session cart
+        session_cart = request.session.get('cart', {})
+        if str(item_id) in session_cart:
+            product = get_object_or_404(Product, pk=item_id)
+            del session_cart[str(item_id)]
+            request.session['cart'] = session_cart
+            messages.success(request, f"{product.name} has been removed from your cart.")
+
     return redirect('products:view_cart')
 
-@login_required
+
 def increment_cart_item(request, item_id):
-    cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
-    cart_item.quantity += 1
-    cart_item.save()
-    return redirect('products:view_cart')
-
-@login_required
-def decrement_cart_item(request, item_id):
-    cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
-    if cart_item.quantity > 1:
-        cart_item.quantity -= 1
+    if request.user.is_authenticated:
+        cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
+        cart_item.quantity += 1
         cart_item.save()
     else:
-        cart_item.delete()
+        # For guest users, increment in session cart
+        session_cart = request.session.get('cart', {})
+        session_cart[str(item_id)] = session_cart.get(str(item_id), 0) + 1
+        request.session['cart'] = session_cart
+
     return redirect('products:view_cart')
+
+
+def decrement_cart_item(request, item_id):
+    if request.user.is_authenticated:
+        cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
+        if cart_item.quantity > 1:
+            cart_item.quantity -= 1
+            cart_item.save()
+        else:
+            cart_item.delete()
+    else:
+        # For guest users, decrement in session cart
+        session_cart = request.session.get('cart', {})
+        if session_cart.get(str(item_id), 0) > 1:
+            session_cart[str(item_id)] -= 1
+        else:
+            del session_cart[str(item_id)]
+        request.session['cart'] = session_cart
+
+    return redirect('products:view_cart')
+
 
 @login_required
 def buy_cart_items(request):
@@ -127,6 +205,7 @@ def buy_cart_items(request):
         return redirect('products:view_cart')
 
     return render(request, 'products/payment.html', {'cart_items': cart_items})
+
 
 @login_required
 def payment_page(request):
@@ -153,6 +232,7 @@ def payment_page(request):
 
     return render(request, 'products/payment.html', {'cart_items': cart_items})
 
+
 @login_required
 def order_confirmation(request):
     cart, created = Cart.objects.get_or_create(user=request.user)
@@ -161,6 +241,7 @@ def order_confirmation(request):
         messages.error(request, "Your cart is empty.")
         return redirect('products:view_cart')
     return render(request, 'products/order_confirmation.html', {'cart_items': cart_items})
+
 
 @login_required
 def place_order(request):
@@ -174,6 +255,7 @@ def place_order(request):
         Order.objects.create(product=item.product, user=request.user)
     cart_items.delete()
     return JsonResponse({'success': True})
+
 
 @login_required
 def product_payment_page(request, pk):
@@ -196,6 +278,7 @@ def product_payment_page(request, pk):
 
     return render(request, 'products/product_payment.html', {'product': product})
 
+
 @login_required
 def product_order_confirmation(request, pk):
     product = get_object_or_404(Product, pk=pk)
@@ -203,6 +286,7 @@ def product_order_confirmation(request, pk):
         Order.objects.create(product=product, user=request.user)
         return JsonResponse({'success': True})
     return render(request, 'products/product_order_confirmation.html', {'product': product})
+
 
 def login(request):
     if request.method == 'POST':
@@ -220,6 +304,7 @@ def login(request):
         else:
             messages.error(request, 'Invalid username or password')
     return render(request, 'products/login.html')
+
 
 def register(request):
     if request.method == 'POST':
@@ -248,13 +333,16 @@ def register(request):
             messages.error(request, f'Error during registration: {e}')
     return render(request, 'products/register.html')
 
+
 def logout(request):
     auth_logout(request)
     messages.info(request, 'You have been logged out.')
     return redirect('products:login')  # Redirect to the login page using the URL name
 
+
 def contact(request):
     return render(request, 'products/contact.html')
+
 
 def about(request):
     return render(request, 'products/about.html')

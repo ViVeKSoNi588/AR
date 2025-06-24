@@ -2,167 +2,255 @@
 {% load static %}
 
 {% block styles %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+<style>
+    /* Custom styles for login page */
+    .login-section {
+        padding: var(--space-xl) 0;
+        background-color: var(--color-light);
+    }
+    
+    .form-card {
+        background-color: var(--color-white);
+        border-radius: var(--radius-md);
+        padding: var(--space-lg);
+        box-shadow: var(--shadow-md);
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    
+    .login-header {
+        text-align: center;
+        margin-bottom: var(--space-lg);
+    }
+    
+    .login-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: var(--space-sm);
+        color: var(--color-primary);
+    }
+    
+    .login-subtitle {
+        color: var(--color-text-light);
+        font-weight: normal;
+    }
+    
+    .form-floating {
+        margin-bottom: var(--space-md);
+    }
+    
+    .form-control {
+        border-radius: var(--radius-md);
+        border: 1px solid #e0e0e0;
+        padding: 0.75rem 1rem;
+        min-height: 58px;
+        font-size: 1rem;
+        transition: var(--transition);
+    }
+    
+    .form-control:focus {
+        box-shadow: 0 0 0 4px rgba(42, 59, 76, 0.1);
+        border-color: var(--color-primary);
+    }
+    
+    .form-check-label {
+        color: var(--color-text-light);
+        font-size: 0.9rem;
+    }
+    
+    .form-check-input:checked {
+        background-color: var(--color-primary);
+        border-color: var(--color-primary);
+    }
+    
+    .btn-login {
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 1.1rem;
+        margin-top: var(--space-md);
+    }
+    
+    .login-footer {
+        text-align: center;
+        margin-top: var(--space-md);
+    }
+    
+    .login-footer a {
+        color: var(--color-primary);
+        font-weight: 500;
+    }
+    
+    .login-footer a:hover {
+        color: var(--color-secondary);
+    }
+    
+    .login-divider {
+        display: flex;
+        align-items: center;
+        margin: var(--space-md) 0;
+    }
+    
+    .login-divider::before,
+    .login-divider::after {
+        content: '';
+        flex: 1;
+        border-top: 1px solid #e0e0e0;
+    }
+    
+    .login-divider span {
+        padding: 0 var(--space-sm);
+        color: var(--color-text-light);
+        font-size: 0.9rem;
+    }
+    
+    .social-login {
+        display: flex;
+        justify-content: center;
+        gap: var(--space-sm);
+        margin-top: var(--space-md);
+    }
+    
+    .social-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        background: #f5f5f5;
+        border-radius: var(--radius-round);
+        transition: var(--transition);
+        color: var(--color-text);
+        border: none;
+    }
+    
+    .social-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .social-btn.google:hover {
+        color: #DB4437;
+    }
+    
+    .social-btn.facebook:hover {
+        color: #4267B2;
+    }
+    
+    .social-btn.twitter:hover {
+        color: #1DA1F2;
+    }
+    
+    .login-messages {
+        padding: var(--space-sm);
+        border-radius: var(--radius-md);
+        margin-bottom: var(--space-md);
+        text-align: center;
+        font-weight: 500;
+    }
+    
+    .login-messages.error {
+        color: var(--color-error);
+        background-color: rgba(231, 76, 60, 0.1);
+    }
+    
+    .login-decoration {
+        position: absolute;
+        z-index: 0;
+        opacity: 0.5;
+    }
+    
+    .login-decoration-1 {
+        top: 10%;
+        left: 5%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(217, 165, 102, 0.2) 0%, rgba(217, 165, 102, 0) 70%);
+        border-radius: var(--radius-round);
+    }
+    
+    .login-decoration-2 {
+        bottom: 5%;
+        right: 10%;
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle, rgba(42, 59, 76, 0.1) 0%, rgba(42, 59, 76, 0) 70%);
+        border-radius: var(--radius-round);
+    }
+</style>
+{% endblock %}
 
-        .container {
-            background-color: #ffffff;
-            padding: 60px 70px; /* Increased padding for a larger form */
-            border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Larger shadow for emphasis */
-            width: 100%;
-            max-width: 700px; /* Increased max-width for a larger form */
-            box-sizing: border-box;
-        }
+{% block content %}
+<div class="login-decoration login-decoration-1"></div>
+<div class="login-decoration login-decoration-2"></div>
 
-        h2 {
-            text-align: center;
-            color: #333333;
-            font-size: 36px; /* Increased font size for the heading */
-            margin-bottom: 40px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 15px;
-            font-weight: bold;
-            color: #555555;
-            font-size: 22px; /* Increased font size for labels */
-        }
-
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 20px; /* Increased padding for inputs */
-            margin-bottom: 30px;
-            border: 1px solid #cccccc;
-            border-radius: 10px;
-            font-size: 20px; /* Increased font size for inputs */
-            box-sizing: border-box;
-        }
-
-        button {
-            width: 100%;
-            padding: 20px; /* Increased padding for the button */
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 22px; /* Increased font size for the button */
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        .messages {
-            margin-top: 25px;
-            color: red;
-            font-size: 20px; /* Increased font size for messages */
-        }
-
-        a {
-            display: block;
-            text-align: center;
-            margin-top: 25px;
-            color: #007BFF;
-            font-size: 20px; /* Increased font size for the link */
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .container {
-                padding: 50px 60px;
-                max-width: 95%; /* Adjusted for tablets */
-            }
-
-            h2 {
-                font-size: 32px;
-            }
-
-            label {
-                font-size: 20px;
-            }
-
-            input[type="text"], input[type="password"] {
-                padding: 18px;
-                font-size: 18px;
-            }
-
-            button {
-                font-size: 20px;
-                padding: 18px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 40px 50px;
-                max-width: 100%; /* Adjusted for mobile devices */
-            }
-
-            h2 {
-                font-size: 30px;
-            }
-
-            label {
-                font-size: 18px;
-            }
-
-            input[type="text"], input[type="password"] {
-                padding: 16px;
-                font-size: 18px;
-            }
-
-            button {
-                font-size: 18px;
-                padding: 16px;
-            }
-        }
-    </style>
-</head>
-<body>
+<section class="login-section">
     <div class="container">
-        <h2>Login</h2>
-        <form method="POST">
-            {% csrf_token %}
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-
-            <button type="submit">Login</button>
-        </form>
-        {% if messages %}
-            <div class="messages">
-                <ul>
-                    {% for message in messages %}
-                        <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-6">
+                <div class="form-card" data-aos="fade-up">
+                    <div class="login-header">
+                        <h1 class="login-title">Welcome Back</h1>
+                        <p class="login-subtitle">Sign in to continue to AR Studio</p>
+                    </div>
+                    
+                    {% if messages %}
+                        <div class="login-messages error">
+                            {% for message in messages %}
+                                {{ message }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="form-floating mb-4">
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
+                            <label for="username">Username</label>
+                        </div>
+                        
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                            <label for="password">Password</label>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="remember" name="remember">
+                                <label class="form-check-label" for="remember">
+                                    Remember me
+                                </label>
+                            </div>
+                            <a href="#" class="small">Forgot Password?</a>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-login">
+                            <i class="fa-solid fa-right-to-bracket me-2"></i>Sign In
+                        </button>
+                    </form>
+                    
+                    <div class="login-divider">
+                        <span>OR</span>
+                    </div>
+                    
+                    <div class="social-login">
+                        <button class="social-btn google" aria-label="Continue with Google">
+                            <i class="fab fa-google"></i>
+                        </button>
+                        <button class="social-btn facebook" aria-label="Continue with Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </button>
+                        <button class="social-btn twitter" aria-label="Continue with Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="login-footer">
+                        <p>Don't have an account? <a href="{% url 'products:register' %}">Sign Up</a></p>
+                    </div>
+                </div>
             </div>
-        {% endif %}
-        <a href="{% url 'products:register' %}">Don't have an account? Signup</a>
+        </div>
     </div>
-</body>
-</html>
+</section>
 {% endblock %}

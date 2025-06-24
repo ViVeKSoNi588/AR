@@ -10,6 +10,9 @@ class Product(models.Model):
     # Change the 3D model field from URLField to FileField:
     model_3d = models.FileField(null=True ,upload_to='models_3d/', help_text="Upload a GLB/GLTF file for AR")
 
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
     def __str__(self):
         return self.name
 

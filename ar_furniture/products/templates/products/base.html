@@ -3,16 +3,310 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Furniture Store{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{% block title %}AR Furniture Studio{% endblock %}</title>
     <link rel="icon" href="{% static 'icons/favicon.ico' %}" type="image/x-icon">
     <link rel="manifest" href="{% static 'manifest.json' %}">
     <link rel="icon" sizes="192x192" href="{% static 'icons/2.png' %}">
     <link rel="apple-touch-icon" href="{% static 'icons/2.png' %}">
-    <meta name="theme-color" content="#007BFF">
+    <meta name="theme-color" content="#2A3B4C">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <script src="https://kit.fontawesome.com/c92e7412c5.js" crossorigin="anonymous"></script>
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    <!-- Mobile-specific styles -->
+    <style>
+        /* Common mobile optimizations */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .section-title h2 {
+                font-size: 1.4rem;
+            }
+            
+            .container {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            
+            .site-header {
+                padding: 15px 0;
+            }
+            
+            .navbar-collapse {
+                background-color: var(--color-white);
+                padding: 1rem;
+                border-radius: var(--radius-md);
+                box-shadow: var(--shadow-md);
+                margin-top: 10px;
+            }
+            
+            .navbar-nav {
+                margin-bottom: 1rem;
+            }
+            
+            .nav-item {
+                text-align: center;
+            }
+            
+            /* Add mobile-specific login/logout buttons in the mobile menu */
+            .mobile-auth-buttons {
+                display: flex;
+                justify-content: center;
+                padding-top: 0.5rem;
+                border-top: 1px solid #eee;
+            }
+            
+            /* Footer enhancements */
+            .footer-links li {
+                margin-bottom: 8px;
+            }
+            
+            .newsletter .form-control {
+                height: 40px;
+            }
+            
+            /* Product grid on homepage */
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+            }
+            
+            /* AR view section adjustments */
+            model-viewer {
+                height: 300px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+            }
+            
+            .site-header {
+                padding: 10px 0;
+            }
+            
+            .logo-text {
+                font-size: 1.3rem;
+            }
+            
+            /* Product cards on homepage */
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 10px;
+            }
+            
+            .product-card .product-image {
+                height: 130px;
+            }
+            
+            .product-info {
+                padding: 10px;
+            }
+            
+            .product-info h3 {
+                font-size: 0.9rem;
+                margin-bottom: 5px;
+            }
+            
+            .product-price {
+                font-size: 0.9rem;
+            }
+            
+            .product-buttons .btn {
+                font-size: 0.8rem;
+                padding: 5px 8px;
+            }
+            
+            /* AR view section adjustments */
+            model-viewer {
+                height: 250px;
+            }
+            
+            /* Footer simplification */
+            .footer-brand p {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+    
     {% block styles %}{% endblock %}
 </head>
 <body>
-    {% block content %}{% endblock %}
+    <div class="page-wrapper">
+        <header class="site-header">
+            <nav class="navbar navbar-expand-lg">
+                <div class="container">
+                    <a class="navbar-brand" href="{% url 'products:product_list' %}">
+                        <span class="logo-text">AR<span class="accent">Studio</span></span>
+                    </a>
+                    
+                    <div class="mobile-nav-buttons d-flex d-lg-none">
+                        <a class="cart-icon me-3" href="{% url 'products:view_cart' %}">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            <span class="cart-count">{{ total_items|default:0 }}</span>
+                        </a>
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                    </div>
+                    
+                    <div class="collapse navbar-collapse" id="mainNavbar">
+                        <ul class="navbar-nav mx-auto">
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.path == '/products/' %}active{% endif %}" href="{% url 'products:product_list' %}">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if '/about/' in request.path %}active{% endif %}" href="{% url 'products:about' %}">About</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if '/contact/' in request.path %}active{% endif %}" href="{% url 'products:contact' %}">Contact</a>
+                            </li>
+                        </ul>
+                        
+                        <!-- Desktop navigation end with cart and login/logout -->
+                        <div class="nav-end d-none d-lg-flex">
+                            <a class="cart-icon me-4" href="{% url 'products:view_cart' %}">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                                <span class="cart-count">{{ total_items|default:0 }}</span>
+                            </a>
+                            
+                            {% if user.is_authenticated %}
+                            <a href="{% url 'products:logout' %}" class="btn btn-outline">Logout</a>
+                            {% else %}
+                            <a href="{% url 'products:login' %}" class="btn btn-primary">Login</a>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Mobile-only login/logout buttons -->
+                        <div class="mobile-auth-buttons d-lg-none">
+                            {% if user.is_authenticated %}
+                            <a href="{% url 'products:logout' %}" class="btn btn-outline btn-sm w-100">Logout</a>
+                            {% else %}
+                            <a href="{% url 'products:login' %}" class="btn btn-primary btn-sm w-100">Login</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <main class="site-content">
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer class="site-footer">
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <div class="footer-brand">
+                            <span class="logo-text">AR<span class="accent">Studio</span></span>
+                            <p class="mt-3">Experience furniture in your space before you buy. Our AR technology brings your interior design dreams to life.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <h5>Quick Links</h5>
+                        <ul class="footer-links">
+                            <li><a href="{% url 'products:product_list' %}">Home</a></li>
+                            <li><a href="{% url 'products:about' %}">About Us</a></li>
+                            <li><a href="{% url 'products:contact' %}">Contact Us</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <h5>Contact</h5>
+                        <address>
+                            <p><i class="fa-solid fa-location-dot me-2"></i> 123 Design Street, City</p>
+                            <p><i class="fa-solid fa-phone me-2"></i> +1 234 567 8900</p>
+                            <p><i class="fa-solid fa-envelope me-2"></i> info@arstudio.com</p>
+                        </address>
+                    </div>
+                    
+                    <div class="col-md-4 col-lg-3">
+                        <h5>Follow Us</h5>
+                        <div class="social-links">
+                            <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                            <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                            <a href="#" aria-label="Twitter"><i class="fa-brands fa-twitter"></i></a>
+                            <a href="#" aria-label="Pinterest"><i class="fa-brands fa-pinterest-p"></i></a>
+                        </div>
+                        <div class="newsletter mt-3">
+                            <form class="d-flex">
+                                <input type="email" placeholder="Your Email" class="form-control me-2">
+                                <button type="submit" class="btn btn-primary">Go</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="footer-bottom">
+                    <p>&copy; {% now "Y" %} AR Studio. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize AOS animations with mobile-friendly settings
+            AOS.init({
+                duration: 800,
+                easing: 'ease-in-out',
+                once: true,
+                mirror: false,
+                disable: window.innerWidth < 768 // Disable animations on mobile for better performance
+            });
+            
+            // Handle mobile menu better on iOS
+            const navbarToggler = document.querySelector('.navbar-toggler');
+            const navbarCollapse = document.getElementById('mainNavbar');
+            
+            if (navbarToggler && navbarCollapse) {
+                navbarToggler.addEventListener('click', function() {
+                    // Ensure smooth animation
+                    setTimeout(function() {
+                        // Scroll to top of navbar when opened on mobile
+                        if (navbarCollapse.classList.contains('show')) {
+                            window.scrollTo({
+                                top: 0,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }, 300);
+                });
+            }
+        });
+    </script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>

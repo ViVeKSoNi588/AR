@@ -2,102 +2,403 @@
 {% load static %}
 
 {% block styles %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Order Confirmation</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+<style>
+    /* Custom styles for Order Confirmation page */
+    .confirmation-section {
+        padding: var(--space-xl) 0;
+        background-color: var(--color-light);
+    }
+    
+    .confirmation-card {
+        background-color: var(--color-white);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        padding: var(--space-lg);
+        max-width: 800px;
+        margin: 0 auto;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .confirmation-header {
+        text-align: center;
+        margin-bottom: var(--space-lg);
+        position: relative;
+        z-index: 2;
+    }
+    
+    .confirmation-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: var(--space-sm);
+        color: var(--color-primary);
+    }
+    
+    .confirmation-header p {
+        font-size: 1.1rem;
+        color: var(--color-text-light);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .confirmation-shape {
+        position: absolute;
+        z-index: 1;
+        opacity: 0.06;
+    }
+    
+    .shape-1 {
+        top: -50px;
+        right: -50px;
+        width: 250px;
+        height: 250px;
+        border-radius: var(--radius-round);
+        background: var(--color-primary);
+    }
+    
+    .shape-2 {
+        bottom: -50px;
+        left: -50px;
+        width: 200px;
+        height: 200px;
+        border-radius: var(--radius-round);
+        background: var(--color-secondary);
+    }
+    
+    .order-summary {
+        padding: var(--space-lg);
+        border-radius: var(--radius-md);
+        background-color: rgba(42, 59, 76, 0.02);
+        margin-bottom: var(--space-lg);
+        position: relative;
+        z-index: 2;
+    }
+    
+    .order-summary h3 {
+        margin-bottom: var(--space-md);
+        color: var(--color-primary);
+        font-size: 1.5rem;
+    }
+    
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: var(--space-xs) 0;
+        font-size: 1rem;
+    }
+    
+    .summary-divider {
+        height: 1px;
+        background-color: #e0e0e0;
+        margin: var(--space-sm) 0;
+    }
+    
+    .summary-total {
+        font-weight: 700;
+        color: var(--color-primary);
+        font-size: 1.2rem;
+    }
+    
+    .shipping-details {
+        margin-bottom: var(--space-lg);
+        position: relative;
+        z-index: 2;
+    }
+    
+    .shipping-details h3 {
+        margin-bottom: var(--space-md);
+        color: var(--color-primary);
+        font-size: 1.5rem;
+    }
+    
+    .detail-card {
+        padding: var(--space-md);
+        border-radius: var(--radius-md);
+        border: 1px solid #e0e0e0;
+        background-color: var(--color-white);
+    }
+    
+    .detail-row {
+        display: flex;
+        margin-bottom: var(--space-xs);
+    }
+    
+    .detail-label {
+        width: 120px;
+        color: var(--color-text-light);
+        font-weight: 500;
+    }
+    
+    .order-actions {
+        text-align: center;
+        margin-top: var(--space-lg);
+        position: relative;
+        z-index: 2;
+    }
+    
+    .order-actions .btn {
+        margin: 0 var(--space-xs);
+    }
+    
+    .btn-primary {
+        padding: 12px 24px;
+        font-weight: 600;
+    }
+    
+    .btn-outline {
+        padding: 12px 24px;
+        font-weight: 600;
+    }
+    
+    .confirmation-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: var(--radius-round);
+        background-color: rgba(var(--color-success-rgb), 0.1);
+        color: var(--color-success);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin: 0 auto var(--space-md);
+    }
+    
+    .tracking-info {
+        padding: var(--space-md);
+        background-color: rgba(42, 59, 76, 0.03);
+        border-radius: var(--radius-md);
+        text-align: center;
+        margin-bottom: var(--space-md);
+        position: relative;
+        z-index: 2;
+    }
+    
+    .tracking-number {
+        font-family: monospace;
+        font-size: 1.1rem;
+        padding: 6px 12px;
+        background-color: rgba(42, 59, 76, 0.07);
+        border-radius: var(--radius-sm);
+        margin: 0 var(--space-xs);
+    }
+    
+    /* Order success modal */
+    .modal-success .modal-content {
+        border: none;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+    }
+    
+    .modal-body-success {
+        padding: var(--space-lg);
+        text-align: center;
+    }
+    
+    .success-animation {
+        margin-bottom: var(--space-md);
+    }
+    
+    .checkmark {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: block;
+        stroke-width: 2;
+        stroke: var(--color-success);
+        stroke-miterlimit: 10;
+        box-shadow: inset 0px 0px 0px var(--color-success);
+        animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+        margin: 0 auto;
+    }
+    
+    .checkmark__circle {
+        stroke-dasharray: 166;
+        stroke-dashoffset: 166;
+        stroke-width: 2;
+        stroke-miterlimit: 10;
+        stroke: var(--color-success);
+        fill: none;
+        animation: stroke .6s cubic-bezier(0.650, 0.000, 0.450, 1.000) forwards;
+    }
+    
+    .checkmark__check {
+        transform-origin: 50% 50%;
+        stroke-dasharray: 48;
+        stroke-dashoffset: 48;
+        animation: stroke .3s cubic-bezier(0.650, 0.000, 0.450, 1.000) .8s forwards;
+    }
+    
+    @keyframes stroke {
+        100% {
+            stroke-dashoffset: 0;
         }
+    }
+    
+    @keyframes scale {
+        0%, 100% {
+            transform: none;
+        }
+        50% {
+            transform: scale3d(1.1, 1.1, 1);
+        }
+    }
+    
+    @keyframes fill {
+        100% {
+            box-shadow: inset 0px 0px 0px 30px rgba(var(--color-success-rgb), 0.1);
+        }
+    }
+</style>
+{% endblock %}
 
-        .container {
-            background-color: #ffffff;
-            padding: 40px 50px;
-            border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 600px;
-            text-align: center;
-        }
-
-        h1 {
-            color: #333333;
-            font-size: 28px;
-            margin-bottom: 20px;
-        }
-
-        .btn {
-            display: inline-block;
-            background-color: #007BFF;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-        .btn:hover {
-            background-color: #0056b3;
-        }
-
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes pop {
-            0% {
-                transform: scale(0.5);
-                opacity: 0;
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-    </style>
-</head>
-<body>
+{% block content %}
+<section class="confirmation-section">
     <div class="container">
-        <h1>Order Confirmation</h1>
-        <p>Review your order and place it.</p>
-        <button class="btn" id="place-order-btn">Place Order</button>
+        <div class="confirmation-card" data-aos="fade-up">
+            <div class="confirmation-shape shape-1"></div>
+            <div class="confirmation-shape shape-2"></div>
+            
+            <div class="confirmation-header">
+                <div class="confirmation-icon">
+                    <i class="fa-solid fa-clipboard-check"></i>
+                </div>
+                <h1>Order Review</h1>
+                <p>Please review your order details before finalizing your purchase.</p>
+            </div>
+            
+            <div class="order-summary">
+                <h3><i class="fa-solid fa-receipt me-2"></i>Order Summary</h3>
+                <div class="table-responsive mb-4">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart_items %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: var(--radius-sm);" class="me-3">
+                                        <div>{{ item.product.name }}</div>
+                                    </div>
+                                </td>
+                                <td>{{ item.quantity }}</td>
+                                <td>Rs {{ item.product.price }}</td>
+                                <td>Rs {{ item.get_total }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="summary-divider"></div>
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span>Rs {{ cart_total }}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <span>Free</span>
+                </div>
+                <div class="summary-row">
+                    <span>Tax (GST)</span>
+                    <span>Included</span>
+                </div>
+                <div class="summary-divider"></div>
+                <div class="summary-row summary-total">
+                    <span>Total</span>
+                    <span>Rs {{ cart_total }}</span>
+                </div>
+            </div>
+            
+            <div class="shipping-details">
+                <h3><i class="fa-solid fa-truck-fast me-2"></i>Shipping Details</h3>
+                <div class="detail-card">
+                    <div class="detail-row">
+                        <div class="detail-label">Name:</div>
+                        <div>{{ shipping_address.name }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Address:</div>
+                        <div>{{ shipping_address.address }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">City:</div>
+                        <div>{{ shipping_address.city }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">State:</div>
+                        <div>{{ shipping_address.state }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">ZIP Code:</div>
+                        <div>{{ shipping_address.zipcode }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Phone:</div>
+                        <div>{{ shipping_address.phone }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tracking-info">
+                <p>Estimated delivery time: <strong>3-5 business days</strong> from order date</p>
+                <p>You will receive a tracking number via email once your order ships</p>
+            </div>
+            
+            <div class="order-actions">
+                <a href="{% url 'products:view_cart' %}" class="btn btn-outline">
+                    <i class="fa-solid fa-arrow-left me-2"></i>Back to Cart
+                </a>
+                <button type="button" id="place-order-btn" class="btn btn-primary">
+                    <i class="fa-solid fa-check me-2"></i>Place Order
+                </button>
+            </div>
+        </div>
     </div>
-    <div class="popup" id="order-popup">
-        <div style="font-size: 50px; color: green; animation: pop 0.5s ease-in-out;">✔</div>
-        <h2>Order Confirmed!</h2>
-        <p>Thank you for your purchase.</p>
+</section>
+
+<!-- Order Success Modal -->
+<div class="modal fade" id="orderSuccessModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-success">
+            <div class="modal-body modal-body-success">
+                <div class="success-animation">
+                    <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                        <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                        <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                    </svg>
+                </div>
+                <h2 class="mb-4">Order Placed Successfully!</h2>
+                <p class="mb-4">Thank you for shopping with AR Furniture. Your order has been confirmed.</p>
+                <p class="mb-4">An email with your order details has been sent to your registered email address.</p>
+                <div class="mt-4">
+                    <a href="{% url 'products:product_list' %}" class="btn btn-primary">
+                        <i class="fa-solid fa-house me-2"></i>Continue Shopping
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-    <script>
-        document.getElementById('place-order-btn').addEventListener('click', function () {
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const orderBtn = document.getElementById('place-order-btn');
+        const successModal = new bootstrap.Modal(document.getElementById('orderSuccessModal'));
+        
+        orderBtn.addEventListener('click', function() {
+            // Show loading state on button
+            orderBtn.disabled = true;
+            orderBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Processing...';
+            
+            // Make API call to place order
             fetch("{% url 'products:place_order' %}", {
                 method: 'POST',
                 headers: {
@@ -108,16 +409,27 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    const popup = document.getElementById('order-popup');
-                    popup.style.display = 'block';
+                    // Show success modal
+                    successModal.show();
+                    
+                    // Redirect after a short delay
                     setTimeout(() => {
                         window.location.href = "{% url 'products:product_list' %}";
-                    }, 2000);
+                    }, 3000);
+                } else {
+                    // Handle error
+                    orderBtn.disabled = false;
+                    orderBtn.innerHTML = '<i class="fa-solid fa-check me-2"></i>Place Order';
+                    alert('There was an error processing your order. Please try again.');
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                orderBtn.disabled = false;
+                orderBtn.innerHTML = '<i class="fa-solid fa-check me-2"></i>Place Order';
+                alert('There was an error processing your order. Please try again.');
+            });
         });
-    </script>
-</body>
-</html>
+    });
+</script>
 {% endblock %}

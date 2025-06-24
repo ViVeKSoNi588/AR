@@ -2,139 +2,1011 @@
 {% load static %}
 
 {% block styles %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Payment for {{ product.name }}</title>
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+<style>
+    /* Custom styles for payment page */
+    .checkout-header {
+        padding: var(--space-lg) 0;
+        background-color: var(--color-light);
+    }
+    
+    .checkout-steps {
+        display: flex;
+        justify-content: center;
+        margin-bottom: var(--space-lg);
+        position: relative;
+    }
+    
+    .checkout-steps:before {
+        content: '';
+        position: absolute;
+        top: 24px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #e0e0e0;
+        z-index: 1;
+    }
+    
+    .step {
+        width: 180px;
+        position: relative;
+        z-index: 2;
+        text-align: center;
+    }
+    
+    .step-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: #e0e0e0;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        margin: 0 auto var(--space-xs);
+        position: relative;
+        z-index: 2;
+        transition: var(--transition);
+    }
+    
+    .step.active .step-icon {
+        background-color: var(--color-primary);
+    }
+    
+    .step.completed .step-icon {
+        background-color: var(--color-success);
+    }
+    
+    .step-text {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--color-text-light);
+        transition: var(--transition);
+    }
+    
+    .step.active .step-text {
+        color: var(--color-primary);
+    }
+    
+    .step.completed .step-text {
+        color: var(--color-success);
+    }
+    
+    .checkout-card {
+        background-color: var(--color-white);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-md);
+        margin-bottom: var(--space-lg);
+        overflow: hidden;
+    }
+    
+    .checkout-card-header {
+        background-color: var(--color-primary);
+        color: var(--color-white);
+        padding: var(--space-sm) var(--space-md);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .checkout-card-header h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .checkout-card-header i {
+        margin-right: var(--space-xs);
+    }
+    
+    .checkout-card-body {
+        padding: var(--space-lg);
+    }
+    
+    .checkout-section {
+        display: none;
+    }
+    
+    .checkout-section.active {
+        display: block;
+        animation: fadeIn 0.4s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-md);
+        margin-bottom: var(--space-md);
+    }
+    
+    .form-group {
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: var(--space-xs);
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #e0e0e0;
+        border-radius: var(--radius-md);
+        font-size: 1rem;
+        transition: var(--transition);
+    }
+    
+    .form-control:focus {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(42, 59, 76, 0.1);
+        outline: none;
+    }
+    
+    .form-select {
+        position: relative;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%232A3B4C' viewBox='0 0 16 16'%3E%3Cpath d='M8 9.5a.5.5 0 0 1-.354-.146l-4-4A.5.5 0 0 1 4 4.5h8a.5.5 0 0 1 .354.854l-4 4A.5.5 0 0 1 8 9.5'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 16px 12px;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        padding-right: 2rem;
+    }
+    
+    .payment-method-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: var(--space-md);
+        margin-bottom: var(--space-lg);
+    }
+    
+    .payment-method-option {
+        position: relative;
+    }
+    
+    .payment-method-option input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+    }
+    
+    .payment-method-label {
+        display: flex;
+        align-items: center;
+        padding: var(--space-sm);
+        border: 2px solid #e0e0e0;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .payment-method-icon {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-sm);
+        background-color: rgba(42, 59, 76, 0.05);
+        margin-right: var(--space-sm);
+        font-size: 1.2rem;
+        color: var(--color-primary);
+    }
+    
+    .payment-method-option input:checked + .payment-method-label {
+        border-color: var(--color-primary);
+        background-color: rgba(42, 59, 76, 0.05);
+    }
+    
+    .payment-details {
+        display: none;
+        padding: var(--space-md);
+        background-color: rgba(42, 59, 76, 0.03);
+        border-radius: var(--radius-md);
+        margin-top: var(--space-md);
+        margin-bottom: var(--space-md);
+    }
+    
+    .payment-details.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    .card-row {
+        display: grid;
+        grid-template-columns: 7fr 3fr 2fr;
+        gap: var(--space-md);
+    }
+    
+    /* Credit card styling */
+    .credit-card {
+        background: linear-gradient(135deg, var(--color-primary), #1a2630);
+        height: 200px;
+        border-radius: var(--radius-md);
+        padding: var(--space-md);
+        color: white;
+        position: relative;
+        margin-bottom: var(--space-lg);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .card-chip {
+        width: 50px;
+        height: 40px;
+        background: linear-gradient(135deg, #ffd700, #ffaa00);
+        border-radius: 6px;
+        margin-bottom: var(--space-md);
+    }
+    
+    .card-number {
+        font-size: 1.4rem;
+        letter-spacing: 2px;
+        margin-bottom: var(--space-md);
+        font-family: monospace;
+    }
+    
+    .card-info {
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .card-holder, .card-expiry {
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        opacity: 0.8;
+        margin-bottom: 4px;
+    }
+    
+    .card-name, .card-date {
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+    }
+    
+    .card-logo {
+        position: absolute;
+        bottom: var(--space-md);
+        right: var(--space-md);
+        font-size: 2rem;
+        opacity: 0.8;
+    }
+    
+    /* Order summary */
+    .order-summary {
+        padding: var(--space-md);
+        border-radius: var(--radius-md);
+        background-color: #f9fafb;
+        margin-bottom: var(--space-lg);
+    }
+    
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: var(--space-xs) 0;
+        font-size: 0.95rem;
+    }
+    
+    .summary-divider {
+        height: 1px;
+        background-color: #e0e0e0;
+        margin: var(--space-sm) 0;
+    }
+    
+    .summary-total {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--color-primary);
+    }
+    
+    /* Buttons */
+    .btn-checkout {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+    
+    .btn-navigation {
+        display: flex;
+        justify-content: space-between;
+        margin-top: var(--space-lg);
+    }
+    
+    /* Add required asterisk */
+    .required:after {
+        content: ' *';
+        color: var(--color-error);
+    }
+    
+    /* Verification badge */
+    .verification-badge {
+        display: inline-flex;
+        align-items: center;
+        background-color: var(--color-success);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 100px;
+        font-size: 0.8rem;
+        margin-left: var(--space-sm);
+    }
+    
+    .verification-badge i {
+        margin-right: 4px;
+    }
+    
+    .spinner {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top: 2px solid white;
+        width: 16px;
+        height: 16px;
+        animation: spin 0.8s linear infinite;
+        margin-right: 6px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
 
-        .container {
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 500px;
-        }
-
-        h1 {
-            color: #333333;
-            font-size: 28px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        label {
-            font-weight: bold;
-            color: #555555;
-        }
-
-        textarea, select, input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #cccccc;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-
-        .btn {
-            display: inline-block;
-            background-color: #007BFF;
-            color: white;
-            padding: 12px 25px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 18px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn:hover {
-            background-color: #0056b3;
-        }
-
-        #payment-details-container {
-            display: none;
-        }
-    </style>
-</head>
-<body>
+{% block content %}
+<!-- Checkout Header Section -->
+<section class="checkout-header">
     <div class="container">
-        <h1>Payment for {{ product.name }}</h1>
-        <form method="POST">
-            {% csrf_token %}
-            <label for="address">Shipping Address:</label>
-            <textarea id="address" name="address" rows="4" required></textarea>
-
-            <label for="payment_type">Payment Type:</label>
-            <select id="payment_type" name="payment_type" required>
-                <option value="">Select Payment Type</option>
-                <option value="upi">UPI</option>
-                <option value="credit_card">Credit Card</option>
-                <option value="debit_card">Debit Card</option>
-                <option value="cod">Cash on Delivery</option>
-            </select>
-
-            <div id="payment-details-container">
-                <label for="payment_details" id="payment-details-label"></label>
-                <input type="text" id="payment_details" name="payment_details">
-                <button type="button" id="verify-btn" class="btn">Verify</button>
+        <h1 class="mb-0">Complete Purchase</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'products:product_list' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'products:product_detail' product.id %}">{{ product.name }}</a></li>
+                <li class="breadcrumb-item active">Payment</li>
+            </ol>
+        </nav>
+        
+        <!-- Checkout Steps -->
+        <div class="checkout-steps mt-4">
+            <div class="step active" id="step-1">
+                <div class="step-icon">1</div>
+                <div class="step-text">Shipping</div>
             </div>
+            <div class="step" id="step-2">
+                <div class="step-icon">2</div>
+                <div class="step-text">Payment</div>
+            </div>
+            <div class="step" id="step-3">
+                <div class="step-icon">3</div>
+                <div class="step-text">Confirm</div>
+            </div>
+        </div>
+    </div>
+</section>
 
-            <button type="submit" class="btn">Proceed to Order Confirmation</button>
+<!-- Checkout Form Section -->
+<section class="checkout-form-section">
+    <div class="container">
+        <form id="checkout-form" method="post" action="{% url 'products:product_payment_page' product.id %}">
+            {% csrf_token %}
+            
+            <!-- Step 1: Shipping Information -->
+            <div class="checkout-section active" id="section-1">
+                <div class="checkout-card mb-4" data-aos="fade-up">
+                    <div class="checkout-card-header">
+                        <h3><i class="fa-solid fa-location-dot"></i> Shipping Information</h3>
+                        <div class="verification-badge"><i class="fa-solid fa-shield-check"></i> Secure</div>
+                    </div>
+                    <div class="checkout-card-body">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fullName" class="form-label required">Full Name</label>
+                                <input type="text" class="form-control" id="fullName" name="fullName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone" class="form-label required">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email" class="form-label required">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="address" class="form-label required">Address</label>
+                            <input type="text" class="form-control" id="address" name="address" required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="city" class="form-label required">City</label>
+                                <input type="text" class="form-control" id="city" name="city" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="state" class="form-label required">State</label>
+                                <input type="text" class="form-control" id="state" name="state" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="zip" class="form-label required">ZIP Code</label>
+                                <input type="text" class="form-control" id="zip" name="zip" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="shipping-notes" class="form-label">Delivery Notes (Optional)</label>
+                            <textarea class="form-control" id="shipping-notes" name="shipping_notes" rows="3" placeholder="Special instructions for delivery"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="btn-navigation">
+                    <a href="{% url 'products:product_detail' product.id %}" class="btn btn-outline"><i class="fa-solid fa-arrow-left"></i> Back to Product</a>
+                    <button type="button" class="btn btn-primary next-step" data-step="1">Continue to Payment <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+            
+            <!-- Step 2: Payment Information -->
+            <div class="checkout-section" id="section-2">
+                <div class="checkout-card mb-4" data-aos="fade-up">
+                    <div class="checkout-card-header">
+                        <h3><i class="fa-solid fa-credit-card"></i> Payment Method</h3>
+                        <div class="verification-badge"><i class="fa-solid fa-shield-check"></i> Secure</div>
+                    </div>
+                    <div class="checkout-card-body">
+                        <div class="payment-method-options">
+                            <div class="payment-method-option">
+                                <input type="radio" name="payment_type" id="payment-credit-card" value="credit_card" checked>
+                                <label for="payment-credit-card" class="payment-method-label">
+                                    <div class="payment-method-icon"><i class="fa-solid fa-credit-card"></i></div>
+                                    <div class="payment-method-text">
+                                        <div class="payment-method-title">Credit Card</div>
+                                        <div class="payment-method-subtitle">Visa, Mastercard, Amex</div>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <div class="payment-method-option">
+                                <input type="radio" name="payment_type" id="payment-upi" value="upi">
+                                <label for="payment-upi" class="payment-method-label">
+                                    <div class="payment-method-icon"><i class="fa-solid fa-mobile-screen"></i></div>
+                                    <div class="payment-method-text">
+                                        <div class="payment-method-title">UPI</div>
+                                        <div class="payment-method-subtitle">Google Pay, PhonePe</div>
+                                    </div>
+                                </label>
+                            </div>
+                            
+                            <div class="payment-method-option">
+                                <input type="radio" name="payment_type" id="payment-cod" value="cod">
+                                <label for="payment-cod" class="payment-method-label">
+                                    <div class="payment-method-icon"><i class="fa-solid fa-money-bill"></i></div>
+                                    <div class="payment-method-text">
+                                        <div class="payment-method-title">Cash on Delivery</div>
+                                        <div class="payment-method-subtitle">Pay when delivered</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Credit Card Details (shown by default) -->
+                        <div class="payment-details active" id="credit-card-details">
+                            <div class="credit-card">
+                                <div class="card-chip"></div>
+                                <div class="card-number" id="card-number-display">•••• •••• •••• ••••</div>
+                                <div class="card-info">
+                                    <div>
+                                        <div class="card-holder">Card Holder</div>
+                                        <div class="card-name" id="card-name-display">Your Name</div>
+                                    </div>
+                                    <div>
+                                        <div class="card-expiry">Expiry</div>
+                                        <div class="card-date" id="card-expiry-display">MM/YY</div>
+                                    </div>
+                                </div>
+                                <div class="card-logo"><i class="fa-brands fa-cc-visa"></i></div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="card-name" class="form-label required">Name on Card</label>
+                                    <input type="text" class="form-control" id="card-name" name="card_name">
+                                </div>
+                            </div>
+                            
+                            <div class="form-row card-row">
+                                <div class="form-group">
+                                    <label for="card-number" class="form-label required">Card Number</label>
+                                    <input type="text" class="form-control" id="card-number" name="card_number" placeholder="1234 5678 9012 3456">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="card-expiry" class="form-label required">Expiry Date</label>
+                                    <input type="text" class="form-control" id="card-expiry" name="card_expiry" placeholder="MM/YY">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="card-cvc" class="form-label required">CVC</label>
+                                    <input type="text" class="form-control" id="card-cvc" name="card_cvc" placeholder="123">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- UPI Details -->
+                        <div class="payment-details" id="upi-details">
+                            <div class="form-group">
+                                <label for="upi-id" class="form-label required">UPI ID</label>
+                                <input type="text" class="form-control" id="upi-id" name="payment_details" placeholder="yourname@upi">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="btn-navigation">
+                    <button type="button" class="btn btn-outline prev-step" data-step="2"><i class="fa-solid fa-arrow-left"></i> Back to Shipping</button>
+                    <button type="button" class="btn btn-primary next-step" data-step="2">Review Order <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+            
+            <!-- Step 3: Review Order -->
+            <div class="checkout-section" id="section-3">
+                <div class="checkout-card mb-4" data-aos="fade-up">
+                    <div class="checkout-card-header">
+                        <h3><i class="fa-solid fa-clipboard-check"></i> Order Summary</h3>
+                    </div>
+                    <div class="checkout-card-body">
+                        <div class="table-responsive">
+                            <table class="table table-borderless">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Price</th>
+                                        <th class="text-end">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="item-info">
+                                                <img src="{{ product.image.url }}" alt="{{ product.name }}" width="80" height="80" style="object-fit: cover; border-radius: 8px;">
+                                                <div class="item-details" style="display: inline-block; vertical-align: middle; margin-left: 10px;">
+                                                    <div class="item-name">{{ product.name }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>Rs {{ product.price }}</td>
+                                        <td class="text-end item-total">Rs {{ product.price }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="order-summary">
+                            <div class="summary-row">
+                                <span>Product Price</span>
+                                <span>Rs {{ product.price }}</span>
+                            </div>
+                            
+                            <div class="summary-row">
+                                <span>Shipping</span>
+                                <span>Rs 50</span>
+                            </div>
+                            
+                            <div class="summary-row">
+                                <span>Tax</span>
+                                <span>Included</span>
+                            </div>
+                            
+                            <div class="summary-divider"></div>
+                            
+                            <div class="summary-row summary-total">
+                                <span>Total</span>
+                                <span>Rs {{ product.price|add:50 }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="shipping-info mt-4">
+                            <h4>Shipping Address</h4>
+                            <p class="mb-0" id="summary-name">Your Name</p>
+                            <p class="mb-0" id="summary-address">Your Address</p>
+                            <p class="mb-0" id="summary-location">City, State ZIP</p>
+                            <p class="mb-0" id="summary-phone">Phone: Your Phone</p>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h4>Payment Method</h4>
+                            <p id="summary-payment-method">Credit Card</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="btn-navigation">
+                    <button type="button" class="btn btn-outline prev-step" data-step="3"><i class="fa-solid fa-arrow-left"></i> Back to Payment</button>
+                    <button type="submit" id="place-order-btn" class="btn btn-primary btn-checkout">
+                        <i class="fa-solid fa-lock me-2"></i> Place Order
+                    </button>
+                </div>
+            </div>
         </form>
     </div>
-    <script>
-        const paymentTypeSelect = document.getElementById('payment_type');
-        const paymentDetailsContainer = document.getElementById('payment-details-container');
-        const paymentDetailsLabel = document.getElementById('payment-details-label');
-        const paymentDetailsInput = document.getElementById('payment_details');
-        const verifyButton = document.getElementById('verify-btn');
+</section>
+{% endblock %}
 
-        paymentTypeSelect.addEventListener('change', function () {
-            const selectedType = this.value;
-            if (selectedType === 'upi') {
-                paymentDetailsContainer.style.display = 'block';
-                paymentDetailsLabel.textContent = 'Enter UPI ID:';
-                paymentDetailsInput.placeholder = 'e.g., yourname@upi';
-                verifyButton.style.display = 'inline-block';
-            } else if (selectedType === 'credit_card' || selectedType === 'debit_card') {
-                paymentDetailsContainer.style.display = 'block';
-                paymentDetailsLabel.textContent = 'Enter Card Number:';
-                paymentDetailsInput.placeholder = 'e.g., 1234 5678 9012 3456';
-                verifyButton.style.display = 'none';
-            } else {
-                paymentDetailsContainer.style.display = 'none';
-            }
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Smooth scroll to top on page load
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // Get all steps and sections
+        const steps = document.querySelectorAll('.step');
+        const sections = document.querySelectorAll('.checkout-section');
+        const nextButtons = document.querySelectorAll('.next-step');
+        const prevButtons = document.querySelectorAll('.prev-step');
+        const paymentMethods = document.querySelectorAll('input[name="payment_type"]');
+        
+        // Form field elements
+        const fullNameField = document.getElementById('fullName');
+        const addressField = document.getElementById('address');
+        const cityField = document.getElementById('city');
+        const stateField = document.getElementById('state');
+        const zipField = document.getElementById('zip');
+        const phoneField = document.getElementById('phone');
+        
+        // Credit card field elements
+        const cardNameInput = document.getElementById('card-name');
+        const cardNumberInput = document.getElementById('card-number');
+        const cardExpiryInput = document.getElementById('card-expiry');
+        
+        // Display elements
+        const cardNameDisplay = document.getElementById('card-name-display');
+        const cardNumberDisplay = document.getElementById('card-number-display');
+        const cardExpiryDisplay = document.getElementById('card-expiry-display');
+        
+        // Summary display elements
+        const summaryName = document.getElementById('summary-name');
+        const summaryAddress = document.getElementById('summary-address');
+        const summaryLocation = document.getElementById('summary-location');
+        const summaryPhone = document.getElementById('summary-phone');
+        const summaryPaymentMethod = document.getElementById('summary-payment-method');
+        
+        // Fix for form submission
+        const checkoutForm = document.getElementById('checkout-form');
+        const placeOrderBtn = document.getElementById('place-order-btn');
+        
+        if (placeOrderBtn && checkoutForm) {
+            placeOrderBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Make sure all required fields are filled
+                const fullName = document.getElementById('fullName').value.trim();
+                const address = document.getElementById('address').value.trim();
+                const city = document.getElementById('city').value.trim();
+                const state = document.getElementById('state').value.trim();
+                const zip = document.getElementById('zip').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+                
+                if (!fullName || !address || !city || !state || !zip || !phone) {
+                    alert('Please fill all required shipping information.');
+                    // Switch back to shipping step
+                    showSection(1);
+                    return;
+                }
+                
+                // Check payment information
+                const selectedPayment = document.querySelector('input[name="payment_type"]:checked');
+                if (!selectedPayment) {
+                    alert('Please select a payment method.');
+                    // Switch back to payment step
+                    showSection(2);
+                    return;
+                }
+                
+                // If credit card is selected, validate card details
+                if (selectedPayment.value === 'credit_card') {
+                    const cardName = document.getElementById('card-name').value.trim();
+                    const cardNumber = document.getElementById('card-number').value.trim();
+                    const cardExpiry = document.getElementById('card-expiry').value.trim();
+                    const cardCvc = document.getElementById('card-cvc').value.trim();
+                    
+                    if (!cardName || !cardNumber || !cardExpiry || !cardCvc) {
+                        alert('Please fill all required credit card information.');
+                        // Switch back to payment step
+                        showSection(2);
+                        return;
+                    }
+                }
+                
+                // If UPI is selected, validate UPI ID
+                if (selectedPayment.value === 'upi') {
+                    const upiId = document.getElementById('upi-id').value.trim();
+                    if (!upiId) {
+                        alert('Please enter your UPI ID.');
+                        // Switch back to payment step
+                        showSection(2);
+                        return;
+                    }
+                }
+                
+                // Submit the form
+                checkoutForm.submit();
+            });
+        }
+        
+        function showSection(sectionNumber) {
+            // Update steps
+            steps.forEach(step => {
+                const stepNum = parseInt(step.id.split('-')[1]);
+                if (stepNum < sectionNumber) {
+                    step.classList.add('completed');
+                    step.classList.remove('active');
+                } else if (stepNum === sectionNumber) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            });
+            
+            // Update sections
+            sections.forEach(section => {
+                const sectionNum = parseInt(section.id.split('-')[1]);
+                if (sectionNum === sectionNumber) {
+                    section.classList.add('active');
+                } else {
+                    section.classList.remove('active');
+                }
+            });
+            
+            // Scroll to top for better user experience
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Navigate to next step
+        nextButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const currentStep = parseInt(this.dataset.step);
+                const nextStep = currentStep + 1;
+                
+                if (currentStep === 1) {
+                    // Validate step 1 fields
+                    if (!validateShippingFields()) {
+                        return;
+                    }
+                    
+                    // Update summary information
+                    summaryName.textContent = fullNameField.value;
+                    summaryAddress.textContent = addressField.value;
+                    summaryLocation.textContent = `${cityField.value}, ${stateField.value} ${zipField.value}`;
+                    summaryPhone.textContent = `Phone: ${phoneField.value}`;
+                }
+                
+                if (currentStep === 2) {
+                    // Validate payment fields based on selected payment method
+                    if (!validatePaymentFields()) {
+                        return;
+                    }
+                    
+                    // Update summary payment method
+                    const selectedPayment = document.querySelector('input[name="payment_type"]:checked');
+                    if (selectedPayment) {
+                        let paymentText = "Credit Card";
+                        if (selectedPayment.value === "upi") paymentText = "UPI";
+                        if (selectedPayment.value === "cod") paymentText = "Cash on Delivery";
+                        summaryPaymentMethod.textContent = paymentText;
+                    }
+                }
+                
+                // Update steps
+                steps.forEach(step => {
+                    const stepNum = parseInt(step.id.split('-')[1]);
+                    if (stepNum < nextStep) {
+                        step.classList.add('completed');
+                        step.classList.remove('active');
+                    } else if (stepNum === nextStep) {
+                        step.classList.add('active');
+                        step.classList.remove('completed');
+                    } else {
+                        step.classList.remove('active', 'completed');
+                    }
+                });
+                
+                // Update sections
+                sections.forEach(section => {
+                    const sectionNum = parseInt(section.id.split('-')[1]);
+                    if (sectionNum === nextStep) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+                
+                // Scroll to top for better user experience
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
         });
-
-        verifyButton.addEventListener('click', function () {
-            const upiId = paymentDetailsInput.value;
-            if (upiId) {
-                alert('UPI ID verified successfully!');
-            } else {
-                alert('Please enter a valid UPI ID.');
-            }
+        
+        // Navigate to previous step
+        prevButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const currentStep = parseInt(this.dataset.step);
+                const prevStep = currentStep - 1;
+                
+                // Update steps
+                steps.forEach(step => {
+                    const stepNum = parseInt(step.id.split('-')[1]);
+                    if (stepNum < prevStep) {
+                        step.classList.add('completed');
+                        step.classList.remove('active');
+                    } else if (stepNum === prevStep) {
+                        step.classList.add('active');
+                        step.classList.remove('completed');
+                    } else {
+                        step.classList.remove('active', 'completed');
+                    }
+                });
+                
+                // Update sections
+                sections.forEach(section => {
+                    const sectionNum = parseInt(section.id.split('-')[1]);
+                    if (sectionNum === prevStep) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+                
+                // Scroll to top for better user experience
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
         });
-    </script>
-</body>
-</html>
+        
+        // Validate shipping fields
+        function validateShippingFields() {
+            const requiredFields = [
+                { field: fullNameField, name: 'full name' },
+                { field: addressField, name: 'address' },
+                { field: cityField, name: 'city' },
+                { field: stateField, name: 'state' },
+                { field: zipField, name: 'ZIP code' },
+                { field: phoneField, name: 'phone number' }
+            ];
+            
+            for (const { field, name } of requiredFields) {
+                if (!field.value.trim()) {
+                    alert(`Please enter your ${name}.`);
+                    field.focus();
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        
+        // Validate payment fields
+        function validatePaymentFields() {
+            const selectedPayment = document.querySelector('input[name="payment_type"]:checked').value;
+            
+            if (selectedPayment === 'credit_card') {
+                if (!cardNameInput.value.trim()) {
+                    alert('Please enter the name on your card.');
+                    cardNameInput.focus();
+                    return false;
+                }
+                
+                if (!cardNumberInput.value.trim() || cardNumberInput.value.replace(/\s/g, '').length < 16) {
+                    alert('Please enter a valid card number.');
+                    cardNumberInput.focus();
+                    return false;
+                }
+                
+                if (!cardExpiryInput.value.trim() || !/^\d{2}\/\d{2}$/.test(cardExpiryInput.value)) {
+                    alert('Please enter a valid expiry date (MM/YY).');
+                    cardExpiryInput.focus();
+                    return false;
+                }
+                
+                if (!document.getElementById('card-cvc').value.trim() || !/^\d{3,4}$/.test(document.getElementById('card-cvc').value)) {
+                    alert('Please enter a valid CVC code.');
+                    document.getElementById('card-cvc').focus();
+                    return false;
+                }
+            } else if (selectedPayment === 'upi') {
+                const upiId = document.getElementById('upi-id');
+                if (!upiId.value.trim() || !upiId.value.includes('@')) {
+                    alert('Please enter a valid UPI ID.');
+                    upiId.focus();
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        
+        // Handle payment method change
+        paymentMethods.forEach(method => {
+            method.addEventListener('change', function() {
+                // Hide all payment details
+                document.querySelectorAll('.payment-details').forEach(detail => {
+                    detail.classList.remove('active');
+                });
+                
+                // Show selected payment method details
+                if (this.value === 'credit_card') {
+                    document.getElementById('credit-card-details').classList.add('active');
+                } else if (this.value === 'upi') {
+                    document.getElementById('upi-details').classList.add('active');
+                }
+            });
+        });
+        
+        // Credit card live preview
+        if (cardNameInput) {
+            cardNameInput.addEventListener('input', function() {
+                cardNameDisplay.textContent = this.value || 'Your Name';
+            });
+        }
+        
+        if (cardNumberInput) {
+            cardNumberInput.addEventListener('input', function() {
+                // Format card number with spaces
+                let value = this.value.replace(/\D/g, '');
+                let formatted = '';
+                for (let i = 0; i < value.length; i++) {
+                    if (i > 0 && i % 4 === 0) {
+                        formatted += ' ';
+                    }
+                    formatted += value[i];
+                }
+                this.value = formatted;
+                
+                // Update display with masking
+                if (value.length > 0) {
+                    let masked = '';
+                    for (let i = 0; i < value.length; i++) {
+                        if (i > 0 && i % 4 === 0) {
+                            masked += ' ';
+                        }
+                        if (i < value.length - 4) {
+                            masked += '•';
+                        } else {
+                            masked += value[i];
+                        }
+                    }
+                    cardNumberDisplay.textContent = masked;
+                } else {
+                    cardNumberDisplay.textContent = '•••• •••• •••• ••••';
+                }
+            });
+        }
+        
+        if (cardExpiryInput) {
+            cardExpiryInput.addEventListener('input', function() {
+                let value = this.value.replace(/\D/g, '');
+                
+                if (value.length > 2) {
+                    this.value = value.slice(0, 2) + '/' + value.slice(2, 4);
+                }
+                
+                cardExpiryDisplay.textContent = this.value || 'MM/YY';
+            });
+        }
+    });
+</script>
 {% endblock %}
 

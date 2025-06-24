@@ -2,130 +2,570 @@
 {% load static %}
 
 {% block styles %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Order Confirmation for {{ product.name }}</title>
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
-            display: flex;
+<style>
+    /* Custom styles for Product Order Confirmation page */
+    .product-confirmation-section {
+        padding: var(--space-xl) 0;
+        background-color: var(--color-light);
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+    }
+    
+    .product-confirmation-card {
+        background-color: var(--color-white);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    
+    .product-confirmation-header {
+        padding: var(--space-lg);
+        background-color: var(--color-primary);
+        color: white;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+    
+    .product-confirmation-header h1 {
+        font-size: 1.8rem;
+        margin-bottom: var(--space-xs);
+    }
+    
+    .product-confirmation-header p {
+        opacity: 0.9;
+        margin-bottom: 0;
+    }
+    
+    .product-confirmation-body {
+        padding: var(--space-lg);
+    }
+    
+    .product-card {
+        display: flex;
+        align-items: center;
+        background-color: rgba(42, 59, 76, 0.02);
+        border-radius: var(--radius-md);
+        padding: var(--space-md);
+        margin-bottom: var(--space-md);
+    }
+    
+    .product-image {
+        width: 120px;
+        height: 120px;
+        border-radius: var(--radius-sm);
+        object-fit: cover;
+        margin-right: var(--space-md);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .product-details {
+        flex: 1;
+    }
+    
+    .product-name {
+        font-size: 1.4rem;
+        margin-bottom: var(--space-xs);
+        color: var(--color-primary);
+    }
+    
+    .product-price {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--color-secondary);
+        margin-bottom: var(--space-xs);
+    }
+    
+    .product-description {
+        color: var(--color-text-light);
+        margin-bottom: var(--space-sm);
+        font-size: 0.9rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .product-meta {
+        display: flex;
+        gap: var(--space-md);
+        margin-top: var(--space-xs);
+    }
+    
+    .meta-item {
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+        color: var(--color-text-light);
+    }
+    
+    .meta-item i {
+        margin-right: 5px;
+        color: var(--color-primary);
+    }
+    
+    .order-details {
+        background-color: rgba(42, 59, 76, 0.02);
+        border-radius: var(--radius-md);
+        padding: var(--space-md);
+        margin-bottom: var(--space-md);
+    }
+    
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: var(--space-xs) 0;
+        font-size: 1rem;
+    }
+    
+    .detail-label {
+        color: var(--color-text-light);
+        font-weight: 500;
+    }
+    
+    .detail-value {
+        font-weight: 600;
+    }
+    
+    .detail-divider {
+        height: 1px;
+        background-color: #e0e0e0;
+        margin: var(--space-xs) 0;
+    }
+    
+    .total-row {
+        font-size: 1.2rem;
+        color: var(--color-primary);
+        font-weight: 700;
+    }
+    
+    .payment-methods {
+        margin-bottom: var(--space-md);
+    }
+    
+    .payment-methods h3 {
+        font-size: 1.2rem;
+        margin-bottom: var(--space-sm);
+        color: var(--color-primary);
+    }
+    
+    .payment-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-sm);
+    }
+    
+    .payment-option {
+        flex: 1;
+        min-width: 100px;
+        max-width: 150px;
+        padding: var(--space-sm);
+        border: 2px solid #e0e0e0;
+        border-radius: var(--radius-md);
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .payment-option.active {
+        border-color: var(--color-primary);
+        background-color: rgba(42, 59, 76, 0.05);
+    }
+    
+    .payment-icon {
+        font-size: 1.8rem;
+        margin-bottom: var(--space-xs);
+        color: var(--color-primary);
+    }
+    
+    .payment-name {
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .confirmation-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: var(--space-lg);
+    }
+    
+    .btn-place-order {
+        min-width: 180px;
+    }
+    
+    /* Success Modal Styling */
+    .success-modal .modal-content {
+        border: none;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+    }
+    
+    .success-modal-body {
+        padding: var(--space-xl) var(--space-lg);
+        text-align: center;
+    }
+    
+    .success-icon {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: rgba(var(--color-success-rgb), 0.1);
+        color: var(--color-success);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        margin: 0 auto var(--space-md);
+    }
+    
+    .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: #f2d74e;
+        animation: confetti 5s ease-in-out infinite;
+    }
+    
+    .confetti:nth-child(2) {
+        background-color: #95c3de;
+        left: 25%;
+        animation-delay: 0.5s;
+    }
+    
+    .confetti:nth-child(3) {
+        background-color: #ff9a91;
+        left: 50%;
+        animation-delay: 1s;
+    }
+    
+    .confetti:nth-child(4) {
+        background-color: #f2d74e;
+        left: 75%;
+        animation-delay: 1.5s;
+    }
+    
+    .confetti:nth-child(5) {
+        background-color: #95c3de;
+        left: 90%;
+        animation-delay: 2s;
+    }
+    
+    @keyframes confetti {
+        0% {
+            transform: translateY(-200px) rotate(0deg);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(200px) rotate(360deg);
+            opacity: 0;
+        }
+    }
+    
+    /* Animated checkmark */
+    .checkmark {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: block;
+        stroke-width: 2;
+        stroke: var(--color-success);
+        stroke-miterlimit: 10;
+        box-shadow: inset 0px 0px 0px var(--color-success);
+        animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+        margin: 0 auto;
+    }
+    
+    .checkmark__circle {
+        stroke-dasharray: 166;
+        stroke-dashoffset: 166;
+        stroke-width: 2;
+        stroke-miterlimit: 10;
+        stroke: var(--color-success);
+        fill: none;
+        animation: stroke .6s cubic-bezier(0.650, 0.000, 0.450, 1.000) forwards;
+    }
+    
+    .checkmark__check {
+        transform-origin: 50% 50%;
+        stroke-dasharray: 48;
+        stroke-dashoffset: 48;
+        animation: stroke .3s cubic-bezier(0.650, 0.000, 0.450, 1.000) .8s forwards;
+    }
+    
+    @keyframes stroke {
+        100% {
+            stroke-dashoffset: 0;
+        }
+    }
+    
+    @keyframes scale {
+        0%, 100% {
+            transform: none;
+        }
+        50% {
+            transform: scale3d(1.1, 1.1, 1);
+        }
+    }
+    
+    @keyframes fill {
+        100% {
+            box-shadow: inset 0px 0px 0px 30px rgba(var(--color-success-rgb), 0.1);
+        }
+    }
+    
+    @media (max-width: 767px) {
+        .product-confirmation-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .product-card {
+            flex-direction: column;
+        }
+        
+        .product-image {
+            width: 100px;
+            height: 100px;
+            margin-right: 0;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .product-details {
+            text-align: center;
+        }
+        
+        .product-meta {
             justify-content: center;
-            align-items: center;
-            height: 100vh;
         }
-
-        .container {
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            text-align: center;
+        
+        .confirmation-actions {
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+        
+        .btn-place-order {
             width: 100%;
-            max-width: 500px;
+            order: -1;
         }
+    }
+</style>
+{% endblock %}
 
-        h1 {
-            color: #333333;
-            font-size: 28px;
-            margin-bottom: 20px;
-        }
-
-        .btn {
-            display: inline-block;
-            background-color: #28a745;
-            color: white;
-            padding: 12px 25px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 18px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .btn:hover {
-            background-color: #218838;
-        }
-
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        .tick {
-            font-size: 60px;
-            color: #28a745;
-            animation: pop 0.5s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes pop {
-            0% {
-                transform: scale(0.5);
-                opacity: 0;
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-    </style>
-</head>
-<body>
+{% block content %}
+<section class="product-confirmation-section">
     <div class="container">
-        <h1>Order Confirmation for {{ product.name }}</h1>
-        <button class="btn" id="place-order-btn">Place Order</button>
+        <div class="product-confirmation-card" data-aos="fade-up">
+            <div class="product-confirmation-header">
+                <h1>Confirm Your Order</h1>
+                <p>Please review your order details before finalizing your purchase</p>
+            </div>
+            
+            <div class="product-confirmation-body">
+                <!-- Product Information -->
+                <div class="product-card" data-aos="fade-up" data-aos-delay="100">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                    <div class="product-details">
+                        <h2 class="product-name">{{ product.name }}</h2>
+                        <div class="product-price">Rs {{ product.price }}</div>
+                        <p class="product-description">{{ product.description }}</p>
+                        <div class="product-meta">
+                            <div class="meta-item">
+                                <i class="fa-solid fa-cube"></i>
+                                <span>{{ product.category }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fa-solid fa-truck-fast"></i>
+                                <span>Free Shipping</span>
+                            </div>
+                            {% if product.model_3d %}
+                            <div class="meta-item">
+                                <i class="fa-solid fa-vr-cardboard"></i>
+                                <span>AR Compatible</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Order Details -->
+                <h3 class="mb-3" data-aos="fade-up" data-aos-delay="200">
+                    <i class="fa-solid fa-receipt me-2"></i>Order Summary
+                </h3>
+                <div class="order-details" data-aos="fade-up" data-aos-delay="200">
+                    <div class="detail-row">
+                        <div class="detail-label">Product Price</div>
+                        <div class="detail-value">Rs {{ product.price }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Shipping</div>
+                        <div class="detail-value">Free</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Taxes</div>
+                        <div class="detail-value">Included</div>
+                    </div>
+                    <div class="detail-divider"></div>
+                    <div class="detail-row total-row">
+                        <div class="detail-label">Total</div>
+                        <div class="detail-value">Rs {{ product.price }}</div>
+                    </div>
+                </div>
+                
+                <!-- Payment Methods -->
+                <div class="payment-methods" data-aos="fade-up" data-aos-delay="300">
+                    <h3>
+                        <i class="fa-solid fa-credit-card me-2"></i>Select Payment Method
+                    </h3>
+                    <div class="payment-options">
+                        <div class="payment-option active" data-method="credit_card">
+                            <div class="payment-icon">
+                                <i class="fa-solid fa-credit-card"></i>
+                            </div>
+                            <div class="payment-name">Credit Card</div>
+                        </div>
+                        <div class="payment-option" data-method="debit_card">
+                            <div class="payment-icon">
+                                <i class="fa-solid fa-credit-card"></i>
+                            </div>
+                            <div class="payment-name">Debit Card</div>
+                        </div>
+                        <div class="payment-option" data-method="upi">
+                            <div class="payment-icon">
+                                <i class="fa-solid fa-mobile-screen"></i>
+                            </div>
+                            <div class="payment-name">UPI</div>
+                        </div>
+                        <div class="payment-option" data-method="cod">
+                            <div class="payment-icon">
+                                <i class="fa-solid fa-money-bill-wave"></i>
+                            </div>
+                            <div class="payment-name">Cash on Delivery</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Customer Info Preview -->
+                <div class="bg-light p-3 rounded mb-4" data-aos="fade-up" data-aos-delay="400">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fa-solid fa-shield-halved me-2 text-success"></i>
+                        <strong>Secure Checkout</strong>
+                    </div>
+                    <p class="small text-muted mb-0">Your payment information is encrypted for your security</p>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="confirmation-actions" data-aos="fade-up" data-aos-delay="500">
+                    <a href="{% url 'products:product_detail' product.id %}" class="btn btn-outline">
+                        <i class="fa-solid fa-arrow-left me-2"></i>Back to Product
+                    </a>
+                    <button type="button" id="place-order-btn" class="btn btn-primary btn-place-order">
+                        <i class="fa-solid fa-check me-2"></i>Place Order
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="popup" id="order-popup">
-        <div class="tick">✔</div>
-        <h2>Order Confirmed!</h2>
-        <p>Thank you for your purchase.</p>
+</section>
+
+<!-- Order Success Modal -->
+<div class="modal fade success-modal" id="orderSuccessModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="confetti"></div>
+            <div class="confetti"></div>
+            <div class="confetti"></div>
+            <div class="confetti"></div>
+            <div class="confetti"></div>
+            <div class="success-modal-body">
+                <!-- Animated checkmark -->
+                <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                    <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                    <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                </svg>
+                
+                <h2 class="mb-3">Order Successful!</h2>
+                <p class="mb-4">Thank you for your purchase. Your order for <strong>{{ product.name }}</strong> has been confirmed.</p>
+                
+                <div class="bg-light p-3 rounded mb-4">
+                    <p class="mb-0">An order confirmation has been sent to your email address.</p>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="{% url 'products:product_list' %}" class="btn btn-primary">
+                        <i class="fa-solid fa-shopping-bag me-2"></i>Continue Shopping
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-    <script>
-        document.getElementById('place-order-btn').addEventListener('click', function () {
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Payment method selection
+        const paymentOptions = document.querySelectorAll('.payment-option');
+        let selectedPaymentMethod = 'credit_card'; // Default selected
+        
+        paymentOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove active class from all options
+                paymentOptions.forEach(opt => opt.classList.remove('active'));
+                // Add active class to clicked option
+                this.classList.add('active');
+                // Store selected payment method
+                selectedPaymentMethod = this.getAttribute('data-method');
+            });
+        });
+        
+        // Order placement
+        const orderBtn = document.getElementById('place-order-btn');
+        const successModal = new bootstrap.Modal(document.getElementById('orderSuccessModal'));
+        
+        orderBtn.addEventListener('click', function() {
+            // Show loading state
+            orderBtn.disabled = true;
+            orderBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Processing...';
+            
+            // Send order request
             fetch("{% url 'products:product_order_confirmation' product.pk %}", {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': '{{ csrf_token }}',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    payment_method: selectedPaymentMethod
+                })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    const popup = document.getElementById('order-popup');
-                    popup.style.display = 'block';
+                    // Show success modal
+                    successModal.show();
+                    
+                    // Redirect after a short delay
                     setTimeout(() => {
                         window.location.href = "{% url 'products:product_list' %}";
-                    }, 2000);
+                    }, 3000);
+                } else {
+                    // Handle error
+                    orderBtn.disabled = false;
+                    orderBtn.innerHTML = '<i class="fa-solid fa-check me-2"></i>Place Order';
+                    alert('There was an error processing your order. Please try again.');
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                orderBtn.disabled = false;
+                orderBtn.innerHTML = '<i class="fa-solid fa-check me-2"></i>Place Order';
+                alert('There was an error processing your order. Please try again.');
+            });
         });
-    </script>
-</body>
-</html>
+    });
+</script>
 {% endblock %}
 
 

@@ -2,89 +2,173 @@
 {% load static %}
 
 {% block styles %}
-<link rel="stylesheet" href="{% static 'css/style.css' %}">
-<script src="https://kit.fontawesome.com/c92e7412c5.js" crossorigin="anonymous"></script>
 <style>
-    .logout-btn {
-        color: white;
-        background-color: red;
-        padding: 10px 15px;
-        border-radius: 5px;
-        text-decoration: none;
-        font-weight: bold;
-    }
-
-    .logout-btn:hover {
-        background-color: darkred;
-    }
-
-    .cart-icon {
-        color: rgb(255, 255, 255);
-        position: relative;
-    }
-
-    .cart-count {
-        position: absolute;
-        top: -10px;
-        right: -10px;
-        background-color: red;
-        color: white;
-        border-radius: 50%;
-        padding: 2px 6px;
-        font-size: 12px;
-    }
-
-    footer {
-        text-align: center;
-        padding: 10px;
-        background-color: #333;
-        color: white;
-        border-top: none;
+    /* Custom styles for product list page */
+    .hero {
+        background: linear-gradient(to right, rgba(42, 59, 76, 0.9), rgba(42, 59, 76, 0.7)), url('{% static "images/hero-bg.jpg" %}') center/cover no-repeat;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<header>
-    <nav class="navbar">
-        <a href="{% url 'products:product_list' %}" class="logo">Furniture Store</a>
-        <ul class="nav-links">
-            <li><a href="{% url 'products:product_list' %}" class="active">Home</a></li>
-            <li><a href="{% url 'products:about' %}">About</a></li>
-            <li><a href="{% url 'products:contact' %}">Contact</a></li>
-            <li>
-                <a href="{% url 'products:view_cart' %}" class="cart-icon">
-                    <i class="fa-solid fa-cart-shopping fa-xl"></i>
-                    
-                    <span class="cart-count">{{ total_items|default:0 }}</span>
-                </a>
-            </li>
-            <li><a href="{% url 'products:logout' %}" class="logout-btn">Logout</a></li>
-        </ul>
-        <div class="menu-btn">&#9776;</div>
-    </nav>
-</header>
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-content" data-aos="fade-up" data-aos-delay="100">
+            <h1 class="hero-title">Transform Your Space with <span class="highlight">AR Furniture</span></h1>
+            <p class="hero-subtitle">Experience furniture in your home before you buy with our augmented reality technology</p>
+            <div class="hero-cta">
+                <a href="#products" class="btn btn-secondary btn-large">Browse Collection</a>
+                <a href="{% url 'products:about' %}" class="btn btn-outline" style="color: white; border-color: white;">Learn More</a>
+            </div>
+        </div>
+    </div>
+    <div class="hero-shape"></div>
+</section>
 
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <div class="section-title" data-aos="fade-up">
+            <span>WHAT MAKES US SPECIAL</span>
+            <h2>Experience The Future of Furniture Shopping</h2>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-cube"></i>
+                    </div>
+                    <h3 class="feature-title">AR Technology</h3>
+                    <p class="feature-desc">Place furniture in your space virtually before purchasing to see how it fits and looks.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-truck-fast"></i>
+                    </div>
+                    <h3 class="feature-title">Fast Delivery</h3>
+                    <p class="feature-desc">Get your furniture delivered to your doorstep within days of placing your order.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <h3 class="feature-title">Quality Guaranteed</h3>
+                    <p class="feature-desc">All our furniture is crafted with premium materials for durability and style.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Products Section -->
+<section id="products" class="product-section">
+    <div class="container">
+        <div class="section-title" data-aos="fade-up">
+            <span>OUR COLLECTION</span>
+            <h2>Discover Our Furniture</h2>
+        </div>
+        
+        <div class="product-grid">
+            {% for product in products %}
+            <div class="product-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:'100' }}">
+                {% if forloop.counter <= 2 %}
+                <span class="product-badge">Popular</span>
+                {% endif %}
+                <a href="{% url 'products:product_detail' product.pk %}">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                </a>
+                <div class="product-info">
+                    <h3><a href="{% url 'products:product_detail' product.pk %}">{{ product.name }}</a></h3>
+                    <span class="product-price">Rs {{ product.price }}</span>
+                    <div class="product-buttons">
+                        <a href="{% url 'products:product_detail' product.pk %}" class="btn btn-primary">Details</a>
+                        <a href="{% url 'products:product_detail' product.pk %}#ar-view" class="btn btn-secondary ar-button">
+                            <i class="fa-solid fa-cube"></i> View in AR
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- AR Demo Section -->
+<section class="ar-section">
+    <div class="container">
+        <div class="section-title" data-aos="fade-up">
+            <span>AUGMENTED REALITY</span>
+            <h2>See How AR Works</h2>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-6" data-aos="fade-right">
+                <div class="ar-container">
+                    <model-viewer 
+                        src="{% static 'models_3d/sofa.glb' %}" 
+                        alt="A 3D model of a sofa" 
+                        ar 
+                        ar-modes="webxr scene-viewer quick-look" 
+                        camera-controls 
+                        shadow-intensity="1" 
+                        auto-rotate>
+                    </model-viewer>
+                </div>
+            </div>
+            
+            <div class="col-md-6" data-aos="fade-left">
+                <div class="ar-instructions">
+                    <h3>How to Use AR View</h3>
+                    <ul class="mt-3">
+                        <li class="mb-2">Click on any product to view its details</li>
+                        <li class="mb-2">Select the "View in AR" button</li>
+                        <li class="mb-2">Point your device at an open floor space</li>
+                        <li class="mb-2">The furniture will appear in your room</li>
+                        <li>Move and rotate to find the perfect spot!</li>
+                    </ul>
+                    <a href="{% url 'products:about' %}" class="btn btn-primary mt-4">Learn More About AR</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="newsletter-section py-5 bg-white">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center" data-aos="fade-up">
+                <h3>Join Our Newsletter</h3>
+                <p>Subscribe to receive updates on new products and special offers.</p>
+                <form class="d-flex justify-content-center mt-4">
+                    <input type="email" class="form-control me-2" placeholder="Your Email Address" style="max-width: 350px;">
+                    <button type="submit" class="btn btn-primary">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Load model-viewer Web Component -->
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+{% endblock %}
+
+{% block scripts %}
 <script>
-    // Toggle Mobile Menu
-    document.querySelector(".menu-btn").addEventListener("click", function() {
-        document.querySelector(".nav-links").classList.toggle("active");
+    // Add animation for product cards on hover
+    document.addEventListener('DOMContentLoaded', function() {
+        // Make sure all images are loaded before applying AOS
+        window.addEventListener('load', function() {
+            AOS.refresh();
+        });
     });
 </script>
-
-<div class="product-list">
-    {% for product in products %}
-        <div class="product-card">
-            <a href="{% url 'products:product_detail' product.pk %}">
-                <img src="{{ product.image.url }}" alt="{{ product.name }}" width="250">
-                <h2>{{ product.name }}</h2>
-            </a>
-            <p>Rs {{ product.price }}</p>
-        </div>
-    {% endfor %}
-</div>
-
-<footer>
-    <p>&copy; 2023 Furniture Store. All rights reserved.</p>
-</footer>
 {% endblock %}
