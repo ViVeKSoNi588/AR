@@ -1,14 +1,14 @@
 {
     "builds": [
         {
-            "src": "ar_furniture/wsgi.py",
+            "src": "ar_furniture/ar_furniture/wsgi.py",
             "use": "@vercel/python"
         }
     ],
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "ar_furniture/wsgi.py"
+            "dest": "ar_furniture/ar_furniture/wsgi.py"
         }
     ]
 }
