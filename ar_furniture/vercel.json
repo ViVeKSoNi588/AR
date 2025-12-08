@@ -1,0 +1,14 @@
+{
+    "builds": [
+        {
+            "src": "ar_furniture/wsgi.py",
+            "use": "@vercel/python"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "ar_furniture/wsgi.py"
+        }
+    ]
+}

@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-z3(80ja-(nrpf(vg^dx9!wvh&i%b$7$2ni9cv7dx=)toef3zu3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.1.33', 'localhost', '127.0.0.1:8000','192.168.159.30', '192.168.135.30' , '172.20.10.9' ,'*.ngrok.io',]
+ALLOWED_HOSTS =['.vercel.app','192.168.193.30','192.168.1.33', 'localhost', '127.0.0.1:5330','127.0.0.1','192.168.159.30', '192.168.135.30' , '172.20.10.9' ,'*.ngrok.io',]
 
 
 # Application definition
